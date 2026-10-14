@@ -6,21 +6,148 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Throwable;
 
 class ProductController extends Controller
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
+        $filters = $request->validate([
+            'q' => ['nullable', 'string', 'max:150'],
+            'stock' => ['nullable', Rule::in(['all', 'low', 'out'])],
+        ]);
+
         $products = Product::with('category')
+            ->forInventory($filters['q'] ?? null, $filters['stock'] ?? 'all')
             ->orderBy('id')
             ->paginate(10);
 
-        return response()->json($products);
+        return response()->json(array_merge($products->toArray(), [
+            'low_stock_threshold' => Product::LOW_STOCK_THRESHOLD,
+        ]));
     }
 
     public function store(Request $request): JsonResponse
     {
-        $validated = $request->validate([
+        $product = $this->saveProduct($request);
+
+        $product->load('category');
+
+        return response()->json([
+            'message' => 'Product created successfully.',
+            'data' => $product,
+        ], 201);
+    }
+
+    public function show(Product $product): JsonResponse
+    {
+        $product->load('category');
+
+        return response()->json([
+            'data' => $product,
+        ]);
+    }
+
+    public function update(Request $request, Product $product): JsonResponse
+    {
+        $product = $this->saveProduct($request, $product);
+
+        $product->load('category');
+
+        return response()->json([
+            'message' => 'Product updated successfully.',
+            'data' => $product,
+        ]);
+    }
+
+    public function destroy(Product $product): JsonResponse
+    {
+        $images = $product->images ?? [];
+        $product->delete();
+        Storage::disk('public')->delete($images);
+
+        return response()->json([
+            'message' => 'Product deleted successfully.',
+        ]);
+    }
+
+    public function image(Product $product, int $image): StreamedResponse
+    {
+        $path = ($product->images ?? [])[$image] ?? null;
+        abort_unless($path && Storage::disk('public')->exists($path), 404);
+
+        return Storage::disk('public')->response($path, null, [
+            'Cache-Control' => 'no-cache',
+            'X-Content-Type-Options' => 'nosniff',
+        ]);
+    }
+
+    private function saveProduct(Request $request, ?Product $product = null): Product
+    {
+        $validated = $this->validateProduct($request, $product);
+        $originalImages = $product?->images ?? [];
+        $retained = $validated['retained_images'] ?? array_keys($originalImages);
+        $uploads = $request->file('images', []);
+
+        if (count($retained) + count($uploads) > 6) {
+            throw ValidationException::withMessages(['images' => 'You can add up to 6 product images.']);
+        }
+
+        $images = array_map(fn (int $index): string => $originalImages[$index], $retained);
+        $newImages = [];
+
+        try {
+            foreach ($uploads as $upload) {
+                $path = $upload->store('product-images', 'public');
+                if ($path === false) {
+                    throw new \RuntimeException('Could not store the product image.');
+                }
+                $newImages[] = $path;
+            }
+
+            $data = Arr::except($validated, ['images', 'retained_images']);
+            $data['images'] = [...$images, ...$newImages];
+            $product = DB::transaction(function () use ($product, $data): Product {
+                if ($product === null) {
+                    return Product::create($data);
+                }
+                $product->update($data);
+
+                return $product;
+            });
+        } catch (Throwable $error) {
+            Storage::disk('public')->delete($newImages);
+            throw $error;
+        }
+
+        Storage::disk('public')->delete(array_values(array_diff($originalImages, $images)));
+
+        return $product;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function validateProduct(Request $request, ?Product $product = null): array
+    {
+        if (is_string($request->input('retained_images'))) {
+            $request->merge(['retained_images' => json_decode($request->input('retained_images'), true)]);
+        }
+
+        return $request->validate([
+            'brand' => ['nullable', 'string', 'max:150'],
+            'barcode' => ['nullable', 'string', 'max:64'],
+            'unit' => ['sometimes', Rule::in(['item', 'pack', 'set', 'box', 'download'])],
+            'images' => ['sometimes', 'array', 'max:6'],
+            'images.*' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'retained_images' => ['sometimes', 'array', 'max:6'],
+            'retained_images.*' => ['required', 'integer', 'distinct', Rule::in(array_keys($product?->images ?? []))],
             'category_id' => [
                 'required',
                 'integer',
@@ -30,7 +157,7 @@ class ProductController extends Controller
                 'required',
                 'string',
                 'max:64',
-                'unique:products,sku',
+                Rule::unique('products', 'sku')->ignore($product?->id),
             ],
             'name' => [
                 'required',
@@ -54,24 +181,6 @@ class ProductController extends Controller
                 'min:0',
                 'max:2147483647',
             ],
-        ]);
-
-        $product = Product::create($validated);
-
-        $product->load('category');
-
-        return response()->json([
-            'message' => 'Product created successfully.',
-            'data' => $product,
-        ], 201);
-    }
-
-    public function show(Product $product): JsonResponse
-    {
-        $product->load('category');
-
-        return response()->json([
-            'data' => $product,
         ]);
     }
 }

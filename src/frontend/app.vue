@@ -1,19 +1,14 @@
 <script setup lang="ts">
-const projectName = 'StudyMart'
+import '~/assets/css/notifications.css'
 </script>
 
 <template>
-  <main>
-    <h1>Welcome to {{ projectName }}</h1>
-    <p>My Centre of Excellence e-commerce project.</p>
-  </main>
+  <UApp
+    :tooltip="{ delayDuration: 200 }"
+    :toaster="{ position: 'top-right', expand: true, duration: 5000 }"
+  >
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+  </UApp>
 </template>
-
-<style scoped>
-main {
-  max-width: 720px;
-  margin: 80px auto;
-  padding: 24px;
-  font-family: Arial, sans-serif;
-}
-</style>

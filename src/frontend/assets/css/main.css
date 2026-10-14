@@ -1,0 +1,59 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+@theme {
+  /* Brand — buttons, links, active navigation */
+  --color-primary: #15803d;
+  --color-primary-hover: #166534;
+  --color-primary-light: #dcfce7;
+  --color-primary-foreground: #ffffff;
+
+  /* Backgrounds — pages, cards, highlighted sections */
+  --color-background: #ffffff;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f8faf9;
+  --color-secondary: #effcf6;
+  --color-secondary-foreground: #14532d;
+
+  /* Text */
+  --color-heading: #102d23;
+  --color-body: #374151;
+  --color-muted: #6b7280;
+
+  /* Borders and keyboard focus */
+  --color-border: #e5e7eb;
+  --color-ring: #15803d;
+
+  /* Footer */
+  --color-footer: #0d3528;
+  --color-footer-foreground: #ffffff;
+  --color-footer-muted: #b8cec3;
+
+  /* Accent — ratings, promotions */
+  --color-accent: #facc15;
+  --color-accent-light: #fef9c3;
+  --color-accent-foreground: #713f12;
+
+  /* Status — stock, orders, validation */
+  --color-success: #15803d;
+  --color-success-light: #dcfce7;
+
+  --color-warning: #92400e;
+  --color-warning-light: #fef3c7;
+
+  --color-danger: #dc2626;
+  --color-danger-light: #fee2e2;
+
+  --color-info: #1d4ed8;
+  --color-info-light: #dbeafe;
+}
+
+@layer base {
+  body {
+    @apply bg-background text-body;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-heading;
+  }
+}
