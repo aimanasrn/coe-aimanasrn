@@ -17,4 +17,8 @@ fi
 
 php artisan migrate --force --no-interaction
 
+if [ "${OBJECT_STORAGE_INITIALIZE:-false}" = "true" ]; then
+    php artisan storage:initialize-local --import-local --no-interaction
+fi
+
 exec "$@"

@@ -70,7 +70,7 @@ class ProductController extends Controller
     {
         $images = $product->images ?? [];
         $product->delete();
-        Storage::disk('public')->delete($images);
+        Storage::disk(config('filesystems.product_images_disk'))->delete($images);
 
         return response()->json([
             'message' => 'Product deleted successfully.',
@@ -80,9 +80,9 @@ class ProductController extends Controller
     public function image(Product $product, int $image): StreamedResponse
     {
         $path = ($product->images ?? [])[$image] ?? null;
-        abort_unless($path && Storage::disk('public')->exists($path), 404);
+        abort_unless($path && Storage::disk(config('filesystems.product_images_disk'))->exists($path), 404);
 
-        return Storage::disk('public')->response($path, null, [
+        return Storage::disk(config('filesystems.product_images_disk'))->response($path, null, [
             'Cache-Control' => 'no-cache',
             'X-Content-Type-Options' => 'nosniff',
         ]);
@@ -104,7 +104,7 @@ class ProductController extends Controller
 
         try {
             foreach ($uploads as $upload) {
-                $path = $upload->store('product-images', 'public');
+                $path = $upload->store('product-images', config('filesystems.product_images_disk'));
                 if ($path === false) {
                     throw new \RuntimeException('Could not store the product image.');
                 }
@@ -122,11 +122,11 @@ class ProductController extends Controller
                 return $product;
             });
         } catch (Throwable $error) {
-            Storage::disk('public')->delete($newImages);
+            Storage::disk(config('filesystems.product_images_disk'))->delete($newImages);
             throw $error;
         }
 
-        Storage::disk('public')->delete(array_values(array_diff($originalImages, $images)));
+        Storage::disk(config('filesystems.product_images_disk'))->delete(array_values(array_diff($originalImages, $images)));
 
         return $product;
     }

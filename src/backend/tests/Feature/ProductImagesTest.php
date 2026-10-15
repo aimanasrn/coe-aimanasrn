@@ -13,6 +13,35 @@ class ProductImagesTest extends TestCase
 {
     use LazilyRefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config(['filesystems.product_images_disk' => 'public']);
+    }
+
+    public function test_product_images_use_the_configured_s3_disk(): void
+    {
+        config(['filesystems.product_images_disk' => 's3']);
+        Storage::fake('s3');
+        Storage::fake('public');
+
+        $response = $this->post('/api/products', [
+            ...$this->payload(),
+            'images' => [$this->image()],
+        ], ['Accept' => 'application/json']);
+
+        $response->assertCreated();
+        $product = Product::findOrFail($response->json('data.id'));
+        $path = $product->images[0];
+        Storage::disk('s3')->assertExists($path);
+        Storage::disk('public')->assertMissing($path);
+        $this->get($response->json('data.image_urls.0'))->assertOk();
+
+        $this->deleteJson("/api/products/{$product->id}")->assertOk();
+        Storage::disk('s3')->assertMissing($path);
+    }
+
     public function test_creates_product_details_and_serves_uploaded_images(): void
     {
         Storage::fake('public');

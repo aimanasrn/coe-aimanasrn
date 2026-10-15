@@ -1,4 +1,26 @@
 services:
+  object-storage:
+    image: rustfs/rustfs:1.0.1
+    command: ["/data"]
+    environment:
+      RUSTFS_ACCESS_KEY: ${OBJECT_STORAGE_ACCESS_KEY:-studymartlocal}
+      RUSTFS_SECRET_KEY: ${OBJECT_STORAGE_SECRET_KEY:?Set OBJECT_STORAGE_SECRET_KEY in the root .env}
+      RUSTFS_ADDRESS: ":9000"
+      RUSTFS_CONSOLE_ADDRESS: ":9001"
+      RUSTFS_CONSOLE_ENABLE: "true"
+      RUSTFS_OBS_LOGGER_LEVEL: error
+    ports:
+      - "127.0.0.1:${OBJECT_STORAGE_PORT:-9000}:9000"
+      - "127.0.0.1:${OBJECT_STORAGE_CONSOLE_PORT:-9001}:9001"
+    volumes:
+      - object_storage_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:9000/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
   postgres:
     image: postgres:17-alpine
     mem_limit: 512m
@@ -35,6 +57,14 @@ services:
       DB_DATABASE: ${POSTGRES_DB:-studymart}
       DB_USERNAME: ${POSTGRES_USER:-studymart}
       DB_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in the root .env}
+      PRODUCT_IMAGES_DISK: s3
+      OBJECT_STORAGE_INITIALIZE: "true"
+      AWS_ACCESS_KEY_ID: ${OBJECT_STORAGE_ACCESS_KEY:-studymartlocal}
+      AWS_SECRET_ACCESS_KEY: ${OBJECT_STORAGE_SECRET_KEY:?Set OBJECT_STORAGE_SECRET_KEY in the root .env}
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_BUCKET: ${OBJECT_STORAGE_BUCKET:-studymart}
+      AWS_ENDPOINT: http://object-storage:9000
+      AWS_USE_PATH_STYLE_ENDPOINT: "true"
     ports:
       - "127.0.0.1:${BACKEND_PORT:-8000}:8000"
     volumes:
@@ -42,6 +72,8 @@ services:
       - backend_vendor:/app/vendor
     depends_on:
       postgres:
+        condition: service_healthy
+      object-storage:
         condition: service_healthy
     healthcheck:
       test: ["CMD", "php", "-r", "exit(@file_get_contents('http://127.0.0.1:8000/up') === false ? 1 : 0);"]
@@ -75,6 +107,7 @@ services:
       start_period: 90s
 
 volumes:
+  object_storage_data:
   postgres_data:
   backend_vendor:
   frontend_node_modules:
