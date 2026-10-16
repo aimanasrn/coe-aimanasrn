@@ -1,0 +1,13 @@
+Generated using the built-in image generation tool.
+Asset: src/frontend/public/studymart-logo.png
+
+Use case: logo-brand.
+Asset type: finished transparent PNG brand logo for StudyMart, an educational shopping brand.
+Primary request: generate a polished, distinctive StudyMart logo, evolving a book-and-shopping-bag concept.
+Composition: a single horizontal logo lockup, centered with balanced modest transparent margins, icon on the left and wordmark on the right. Large crisp artwork suitable for website headers and printed branding.
+Mark: a simple bold green shopping bag silhouette with a curved handle; integrate a clean white open book inside the bag and a small golden-yellow bookmark accent. Strong geometry, thoughtful negative space, slightly rounded edges, legible at small sizes, professionally crafted proportions.
+Text (verbatim): "StudyMart". Spell S-t-u-d-y-M-a-r-t exactly. One word, capital S and M. Contemporary bold humanist sans-serif typography with meticulous spacing. "Study" in deep forest green #102d23 and "Mart" in green #15803d.
+Color palette: green #15803d, deep forest #102d23, white book pages, yellow #facc15 accent.
+Style: clean flat vector-like brand design rendered as a high-resolution raster, confident and friendly, refined simplicity.
+Background: genuinely transparent alpha channel, including exterior margins. Preserve white book-page fills inside the mark.
+Constraints: exactly one complete logo, no Admin label, no tagline, no mockup, no presentation board, no additional text, no gradient, no shadow, no 3D, no watermark, no checkerboard baked into the image.

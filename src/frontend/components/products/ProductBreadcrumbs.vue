@@ -28,6 +28,9 @@ const items = computed<BreadcrumbItem[]>(() => {
 <template>
   <UBreadcrumb
     :items="items"
-    class="sm-product-breadcrumbs"
+    class="
+      mb-7 max-md:mb-6 [&_ol]:flex-wrap [&_ol]:gap-y-2 [&_li]:max-md:max-w-full [&_a]:max-md:whitespace-normal
+      [&_a]:max-md:wrap-anywhere [&_span]:max-md:whitespace-normal [&_span]:max-md:wrap-anywhere
+    "
   />
 </template>

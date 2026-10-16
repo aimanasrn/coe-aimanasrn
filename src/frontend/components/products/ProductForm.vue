@@ -213,17 +213,20 @@ async function submit() {
 <template>
   <div
     v-if="status === 'pending' || status === 'idle'"
-    class="sm-admin-table-loading"
+    class="grid min-h-[235px] place-items-center p-[26px]"
   >
     <StudyMartLoader label="Loading categories" />
   </div>
   <div
     v-else-if="error"
-    class="sm-admin-notice sm-admin-notice-error"
+    class="mb-5 rounded-[7px] border px-[18px] py-3.5 text-sm border-[#f0d5d5] bg-[#fff4f4] text-[#a03939]"
   >
     Could not load categories.
     <button
-      class="sm-admin-link"
+      class="
+        inline-flex items-center gap-[9px] text-[15px] font-[550] text-primary cursor-pointer hover:text-primary-hover
+        hover:underline hover:underline-offset-4 [&_.iconify]:size-[18px] [&_.iconify]:shrink-0
+      "
       @click="refresh()"
     >
       Try again
@@ -231,7 +234,7 @@ async function submit() {
   </div>
   <p
     v-else-if="!categories?.data.length"
-    class="sm-admin-notice"
+    class="mb-5 rounded-[7px] border px-[18px] py-3.5 text-sm border-[#d3ead9] bg-[#edf8f0] text-[#25683b]"
   >
     Create a category in your catalog before adding a product.
   </p>
@@ -242,21 +245,24 @@ async function submit() {
     :validate="validate"
     :validate-on="['blur', 'change', 'input']"
     :disabled="saving"
-    class="sm-admin-form sm-product-form"
+    class="flex flex-col gap-5 "
     novalidate
     @submit="submit"
     @error="focusFirstError"
   >
     <p
       v-if="message"
-      class="sm-admin-notice sm-admin-notice-error"
+      class="mb-5 rounded-[7px] border px-[18px] py-3.5 text-sm border-[#f0d5d5] bg-[#fff4f4] text-[#a03939]"
       role="alert"
     >
       {{ message }}
     </p>
-    <div class="sm-product-editor-grid">
+    <div class="grid grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] items-stretch gap-6 max-[1101px]:grid-cols-1">
       <section
-        class="sm-product-editor-panel sm-product-images-panel"
+        class="
+          min-w-0 rounded-[10px] border border-[#e0e6e2] bg-white p-[26px] max-md:p-[18px] [&_h2]:mt-0 [&_h2]:mb-5
+          [&_h2]:text-xl [&_h2]:leading-[1.4] [&_h2]:font-[650] [&_h2]:text-heading max-[1101px]:order-0
+        "
         aria-labelledby="product-images-heading"
       >
         <h2 id="product-images-heading">Product images</h2>
@@ -272,7 +278,10 @@ async function submit() {
         </UFormField>
       </section>
       <section
-        class="sm-product-editor-panel sm-product-information"
+        class="
+          min-w-0 rounded-[10px] border border-[#e0e6e2] bg-white p-[26px] max-md:p-[18px] [&_h2]:mt-0 [&_h2]:mb-5
+          [&_h2]:text-xl [&_h2]:leading-[1.4] [&_h2]:font-[650] [&_h2]:text-heading flex flex-col gap-[22px] [&>h2]:mb-0
+        "
         aria-labelledby="product-information-heading"
       >
         <h2 id="product-information-heading">Product information</h2>
@@ -280,7 +289,21 @@ async function submit() {
           name="name"
           label="Product name"
           required
-          class="sm-admin-field"
+          class="
+            flex flex-col gap-[7px] [&_label]:text-sm [&_label]:font-[550] [&_label]:text-[#374f40]
+            [&_label_span]:font-normal [&_label_span]:text-[#7b867f] [&_input]:min-h-11 [&_input]:w-full
+            [&_input]:rounded-md [&_input]:border [&_input]:border-[#dce4df] [&_input]:bg-white [&_input]:px-3
+            [&_input]:py-2.5 [&_input]:font-[inherit] [&_input]:text-[15px] [&_input]:text-[#37463f]
+            [&_input]:focus:outline-2 [&_input]:focus:outline-primary [&_input]:focus:outline-offset-1
+            [&_textarea]:min-h-11 [&_textarea]:w-full [&_textarea]:rounded-md [&_textarea]:border
+            [&_textarea]:border-[#dce4df] [&_textarea]:bg-white [&_textarea]:px-3 [&_textarea]:py-2.5
+            [&_textarea]:font-[inherit] [&_textarea]:text-[15px] [&_textarea]:text-[#37463f] [&_textarea]:focus:outline-2
+            [&_textarea]:focus:outline-primary [&_textarea]:focus:outline-offset-1 [&_select]:min-h-11 [&_select]:w-full
+            [&_select]:rounded-md [&_select]:border [&_select]:border-[#dce4df] [&_select]:bg-white [&_select]:px-3
+            [&_select]:py-2.5 [&_select]:font-[inherit] [&_select]:text-[15px] [&_select]:text-[#37463f]
+            [&_select]:focus:outline-2 [&_select]:focus:outline-primary [&_select]:focus:outline-offset-1
+            [&_[aria-invalid=true]]:border-[#b83d3d] [&>p]:text-xs [&>p]:text-[#b83d3d]
+          "
         >
           <UInput
             id="product-name"
@@ -290,12 +313,26 @@ async function submit() {
             class="w-full"
           />
         </UFormField>
-        <div class="sm-admin-form-grid">
+        <div class="grid grid-cols-2 gap-5 max-md:grid-cols-1 max-md:gap-[18px]">
           <UFormField
             name="sku"
             label="SKU"
             required
-            class="sm-admin-field"
+            class="
+              flex flex-col gap-[7px] [&_label]:text-sm [&_label]:font-[550] [&_label]:text-[#374f40]
+              [&_label_span]:font-normal [&_label_span]:text-[#7b867f] [&_input]:min-h-11 [&_input]:w-full
+              [&_input]:rounded-md [&_input]:border [&_input]:border-[#dce4df] [&_input]:bg-white [&_input]:px-3
+              [&_input]:py-2.5 [&_input]:font-[inherit] [&_input]:text-[15px] [&_input]:text-[#37463f]
+              [&_input]:focus:outline-2 [&_input]:focus:outline-primary [&_input]:focus:outline-offset-1
+              [&_textarea]:min-h-11 [&_textarea]:w-full [&_textarea]:rounded-md [&_textarea]:border
+              [&_textarea]:border-[#dce4df] [&_textarea]:bg-white [&_textarea]:px-3 [&_textarea]:py-2.5
+              [&_textarea]:font-[inherit] [&_textarea]:text-[15px] [&_textarea]:text-[#37463f] [&_textarea]:focus:outline-2
+              [&_textarea]:focus:outline-primary [&_textarea]:focus:outline-offset-1 [&_select]:min-h-11 [&_select]:w-full
+              [&_select]:rounded-md [&_select]:border [&_select]:border-[#dce4df] [&_select]:bg-white [&_select]:px-3
+              [&_select]:py-2.5 [&_select]:font-[inherit] [&_select]:text-[15px] [&_select]:text-[#37463f]
+              [&_select]:focus:outline-2 [&_select]:focus:outline-primary [&_select]:focus:outline-offset-1
+              [&_[aria-invalid=true]]:border-[#b83d3d] [&>p]:text-xs [&>p]:text-[#b83d3d]
+            "
           >
             <UInput
               id="product-sku"
@@ -309,7 +346,21 @@ async function submit() {
             name="category_id"
             label="Category"
             required
-            class="sm-admin-field"
+            class="
+              flex flex-col gap-[7px] [&_label]:text-sm [&_label]:font-[550] [&_label]:text-[#374f40]
+              [&_label_span]:font-normal [&_label_span]:text-[#7b867f] [&_input]:min-h-11 [&_input]:w-full
+              [&_input]:rounded-md [&_input]:border [&_input]:border-[#dce4df] [&_input]:bg-white [&_input]:px-3
+              [&_input]:py-2.5 [&_input]:font-[inherit] [&_input]:text-[15px] [&_input]:text-[#37463f]
+              [&_input]:focus:outline-2 [&_input]:focus:outline-primary [&_input]:focus:outline-offset-1
+              [&_textarea]:min-h-11 [&_textarea]:w-full [&_textarea]:rounded-md [&_textarea]:border
+              [&_textarea]:border-[#dce4df] [&_textarea]:bg-white [&_textarea]:px-3 [&_textarea]:py-2.5
+              [&_textarea]:font-[inherit] [&_textarea]:text-[15px] [&_textarea]:text-[#37463f] [&_textarea]:focus:outline-2
+              [&_textarea]:focus:outline-primary [&_textarea]:focus:outline-offset-1 [&_select]:min-h-11 [&_select]:w-full
+              [&_select]:rounded-md [&_select]:border [&_select]:border-[#dce4df] [&_select]:bg-white [&_select]:px-3
+              [&_select]:py-2.5 [&_select]:font-[inherit] [&_select]:text-[15px] [&_select]:text-[#37463f]
+              [&_select]:focus:outline-2 [&_select]:focus:outline-primary [&_select]:focus:outline-offset-1
+              [&_[aria-invalid=true]]:border-[#b83d3d] [&>p]:text-xs [&>p]:text-[#b83d3d]
+            "
           >
             <USelect
               id="product-category"
@@ -325,7 +376,21 @@ async function submit() {
             name="price"
             label="Price (RM)"
             required
-            class="sm-admin-field"
+            class="
+              flex flex-col gap-[7px] [&_label]:text-sm [&_label]:font-[550] [&_label]:text-[#374f40]
+              [&_label_span]:font-normal [&_label_span]:text-[#7b867f] [&_input]:min-h-11 [&_input]:w-full
+              [&_input]:rounded-md [&_input]:border [&_input]:border-[#dce4df] [&_input]:bg-white [&_input]:px-3
+              [&_input]:py-2.5 [&_input]:font-[inherit] [&_input]:text-[15px] [&_input]:text-[#37463f]
+              [&_input]:focus:outline-2 [&_input]:focus:outline-primary [&_input]:focus:outline-offset-1
+              [&_textarea]:min-h-11 [&_textarea]:w-full [&_textarea]:rounded-md [&_textarea]:border
+              [&_textarea]:border-[#dce4df] [&_textarea]:bg-white [&_textarea]:px-3 [&_textarea]:py-2.5
+              [&_textarea]:font-[inherit] [&_textarea]:text-[15px] [&_textarea]:text-[#37463f] [&_textarea]:focus:outline-2
+              [&_textarea]:focus:outline-primary [&_textarea]:focus:outline-offset-1 [&_select]:min-h-11 [&_select]:w-full
+              [&_select]:rounded-md [&_select]:border [&_select]:border-[#dce4df] [&_select]:bg-white [&_select]:px-3
+              [&_select]:py-2.5 [&_select]:font-[inherit] [&_select]:text-[15px] [&_select]:text-[#37463f]
+              [&_select]:focus:outline-2 [&_select]:focus:outline-primary [&_select]:focus:outline-offset-1
+              [&_[aria-invalid=true]]:border-[#b83d3d] [&>p]:text-xs [&>p]:text-[#b83d3d]
+            "
           >
             <UInput
               id="product-price"
@@ -342,7 +407,21 @@ async function submit() {
             name="stock_quantity"
             label="Stock quantity"
             required
-            class="sm-admin-field"
+            class="
+              flex flex-col gap-[7px] [&_label]:text-sm [&_label]:font-[550] [&_label]:text-[#374f40]
+              [&_label_span]:font-normal [&_label_span]:text-[#7b867f] [&_input]:min-h-11 [&_input]:w-full
+              [&_input]:rounded-md [&_input]:border [&_input]:border-[#dce4df] [&_input]:bg-white [&_input]:px-3
+              [&_input]:py-2.5 [&_input]:font-[inherit] [&_input]:text-[15px] [&_input]:text-[#37463f]
+              [&_input]:focus:outline-2 [&_input]:focus:outline-primary [&_input]:focus:outline-offset-1
+              [&_textarea]:min-h-11 [&_textarea]:w-full [&_textarea]:rounded-md [&_textarea]:border
+              [&_textarea]:border-[#dce4df] [&_textarea]:bg-white [&_textarea]:px-3 [&_textarea]:py-2.5
+              [&_textarea]:font-[inherit] [&_textarea]:text-[15px] [&_textarea]:text-[#37463f] [&_textarea]:focus:outline-2
+              [&_textarea]:focus:outline-primary [&_textarea]:focus:outline-offset-1 [&_select]:min-h-11 [&_select]:w-full
+              [&_select]:rounded-md [&_select]:border [&_select]:border-[#dce4df] [&_select]:bg-white [&_select]:px-3
+              [&_select]:py-2.5 [&_select]:font-[inherit] [&_select]:text-[15px] [&_select]:text-[#37463f]
+              [&_select]:focus:outline-2 [&_select]:focus:outline-primary [&_select]:focus:outline-offset-1
+              [&_[aria-invalid=true]]:border-[#b83d3d] [&>p]:text-xs [&>p]:text-[#b83d3d]
+            "
           >
             <UInput
               id="product-stock"
@@ -358,7 +437,21 @@ async function submit() {
         </div>
         <UFormField
           name="description"
-          class="sm-admin-field"
+          class="
+            flex flex-col gap-[7px] [&_label]:text-sm [&_label]:font-[550] [&_label]:text-[#374f40]
+            [&_label_span]:font-normal [&_label_span]:text-[#7b867f] [&_input]:min-h-11 [&_input]:w-full
+            [&_input]:rounded-md [&_input]:border [&_input]:border-[#dce4df] [&_input]:bg-white [&_input]:px-3
+            [&_input]:py-2.5 [&_input]:font-[inherit] [&_input]:text-[15px] [&_input]:text-[#37463f]
+            [&_input]:focus:outline-2 [&_input]:focus:outline-primary [&_input]:focus:outline-offset-1
+            [&_textarea]:min-h-11 [&_textarea]:w-full [&_textarea]:rounded-md [&_textarea]:border
+            [&_textarea]:border-[#dce4df] [&_textarea]:bg-white [&_textarea]:px-3 [&_textarea]:py-2.5
+            [&_textarea]:font-[inherit] [&_textarea]:text-[15px] [&_textarea]:text-[#37463f] [&_textarea]:focus:outline-2
+            [&_textarea]:focus:outline-primary [&_textarea]:focus:outline-offset-1 [&_select]:min-h-11 [&_select]:w-full
+            [&_select]:rounded-md [&_select]:border [&_select]:border-[#dce4df] [&_select]:bg-white [&_select]:px-3
+            [&_select]:py-2.5 [&_select]:font-[inherit] [&_select]:text-[15px] [&_select]:text-[#37463f]
+            [&_select]:focus:outline-2 [&_select]:focus:outline-primary [&_select]:focus:outline-offset-1
+            [&_[aria-invalid=true]]:border-[#b83d3d] [&>p]:text-xs [&>p]:text-[#b83d3d]
+          "
         >
           <template #label>
             Description
@@ -371,16 +464,30 @@ async function submit() {
             class="w-full"
           />
         </UFormField>
-        <div class="sm-product-extra-details">
+        <div class="mt-1 border-t border-[#e5eae7] pt-6 [&>div]:grid-cols-[minmax(0,1.2fr)_minmax(0,1.2fr)_minmax(0,1fr)] [&>div]:gap-4 [&>div]:max-md:grid-cols-1 [&_h2_span]:ml-2 [&_h2_span]:text-[13px] [&_h2_span]:font-normal [&_h2_span]:text-[#89928c]">
           <h2>
             Additional details
             <span>Optional</span>
           </h2>
-          <div class="sm-admin-form-grid">
+          <div class="grid grid-cols-2 gap-5 max-md:grid-cols-1 max-md:gap-[18px]">
             <UFormField
               name="brand"
               label="Brand / publisher"
-              class="sm-admin-field"
+              class="
+                flex flex-col gap-[7px] [&_label]:text-sm [&_label]:font-[550] [&_label]:text-[#374f40]
+                [&_label_span]:font-normal [&_label_span]:text-[#7b867f] [&_input]:min-h-11 [&_input]:w-full
+                [&_input]:rounded-md [&_input]:border [&_input]:border-[#dce4df] [&_input]:bg-white [&_input]:px-3
+                [&_input]:py-2.5 [&_input]:font-[inherit] [&_input]:text-[15px] [&_input]:text-[#37463f]
+                [&_input]:focus:outline-2 [&_input]:focus:outline-primary [&_input]:focus:outline-offset-1
+                [&_textarea]:min-h-11 [&_textarea]:w-full [&_textarea]:rounded-md [&_textarea]:border
+                [&_textarea]:border-[#dce4df] [&_textarea]:bg-white [&_textarea]:px-3 [&_textarea]:py-2.5
+                [&_textarea]:font-[inherit] [&_textarea]:text-[15px] [&_textarea]:text-[#37463f] [&_textarea]:focus:outline-2
+                [&_textarea]:focus:outline-primary [&_textarea]:focus:outline-offset-1 [&_select]:min-h-11 [&_select]:w-full
+                [&_select]:rounded-md [&_select]:border [&_select]:border-[#dce4df] [&_select]:bg-white [&_select]:px-3
+                [&_select]:py-2.5 [&_select]:font-[inherit] [&_select]:text-[15px] [&_select]:text-[#37463f]
+                [&_select]:focus:outline-2 [&_select]:focus:outline-primary [&_select]:focus:outline-offset-1
+                [&_[aria-invalid=true]]:border-[#b83d3d] [&>p]:text-xs [&>p]:text-[#b83d3d]
+              "
             >
               <UInput
                 id="product-brand"
@@ -392,7 +499,21 @@ async function submit() {
             <UFormField
               name="barcode"
               label="Barcode / ISBN"
-              class="sm-admin-field"
+              class="
+                flex flex-col gap-[7px] [&_label]:text-sm [&_label]:font-[550] [&_label]:text-[#374f40]
+                [&_label_span]:font-normal [&_label_span]:text-[#7b867f] [&_input]:min-h-11 [&_input]:w-full
+                [&_input]:rounded-md [&_input]:border [&_input]:border-[#dce4df] [&_input]:bg-white [&_input]:px-3
+                [&_input]:py-2.5 [&_input]:font-[inherit] [&_input]:text-[15px] [&_input]:text-[#37463f]
+                [&_input]:focus:outline-2 [&_input]:focus:outline-primary [&_input]:focus:outline-offset-1
+                [&_textarea]:min-h-11 [&_textarea]:w-full [&_textarea]:rounded-md [&_textarea]:border
+                [&_textarea]:border-[#dce4df] [&_textarea]:bg-white [&_textarea]:px-3 [&_textarea]:py-2.5
+                [&_textarea]:font-[inherit] [&_textarea]:text-[15px] [&_textarea]:text-[#37463f] [&_textarea]:focus:outline-2
+                [&_textarea]:focus:outline-primary [&_textarea]:focus:outline-offset-1 [&_select]:min-h-11 [&_select]:w-full
+                [&_select]:rounded-md [&_select]:border [&_select]:border-[#dce4df] [&_select]:bg-white [&_select]:px-3
+                [&_select]:py-2.5 [&_select]:font-[inherit] [&_select]:text-[15px] [&_select]:text-[#37463f]
+                [&_select]:focus:outline-2 [&_select]:focus:outline-primary [&_select]:focus:outline-offset-1
+                [&_[aria-invalid=true]]:border-[#b83d3d] [&>p]:text-xs [&>p]:text-[#b83d3d]
+              "
             >
               <UInput
                 id="product-barcode"
@@ -404,7 +525,21 @@ async function submit() {
             <UFormField
               name="unit"
               label="Selling unit"
-              class="sm-admin-field"
+              class="
+                flex flex-col gap-[7px] [&_label]:text-sm [&_label]:font-[550] [&_label]:text-[#374f40]
+                [&_label_span]:font-normal [&_label_span]:text-[#7b867f] [&_input]:min-h-11 [&_input]:w-full
+                [&_input]:rounded-md [&_input]:border [&_input]:border-[#dce4df] [&_input]:bg-white [&_input]:px-3
+                [&_input]:py-2.5 [&_input]:font-[inherit] [&_input]:text-[15px] [&_input]:text-[#37463f]
+                [&_input]:focus:outline-2 [&_input]:focus:outline-primary [&_input]:focus:outline-offset-1
+                [&_textarea]:min-h-11 [&_textarea]:w-full [&_textarea]:rounded-md [&_textarea]:border
+                [&_textarea]:border-[#dce4df] [&_textarea]:bg-white [&_textarea]:px-3 [&_textarea]:py-2.5
+                [&_textarea]:font-[inherit] [&_textarea]:text-[15px] [&_textarea]:text-[#37463f] [&_textarea]:focus:outline-2
+                [&_textarea]:focus:outline-primary [&_textarea]:focus:outline-offset-1 [&_select]:min-h-11 [&_select]:w-full
+                [&_select]:rounded-md [&_select]:border [&_select]:border-[#dce4df] [&_select]:bg-white [&_select]:px-3
+                [&_select]:py-2.5 [&_select]:font-[inherit] [&_select]:text-[15px] [&_select]:text-[#37463f]
+                [&_select]:focus:outline-2 [&_select]:focus:outline-primary [&_select]:focus:outline-offset-1
+                [&_[aria-invalid=true]]:border-[#b83d3d] [&>p]:text-xs [&>p]:text-[#b83d3d]
+              "
             >
               <USelect
                 id="product-unit"
@@ -418,10 +553,14 @@ async function submit() {
         </div>
       </section>
     </div>
-    <div class="sm-admin-form-actions sm-product-form-footer">
+    <div class="flex justify-end gap-3 border-t border-[#dce4df] pt-5 [&>button]:px-[18px]! [&>button]:py-[11px]! [&>button]:text-[15px]!">
       <button
         type="button"
-        class="sm-admin-button-secondary"
+        class="
+          inline-flex items-center justify-center gap-[9px] rounded-[7px] border px-5 py-[13px] font-[inherit]
+          text-[18px] leading-6 font-semibold whitespace-nowrap cursor-pointer transition-colors duration-150 max-md:px-4
+          max-md:py-2.5 max-md:text-sm border-[#dce4df] bg-white text-[#37463f] hover:bg-surface-muted
+        "
         :disabled="saving"
         @click="emit('cancel')"
       >
@@ -429,7 +568,11 @@ async function submit() {
       </button>
       <button
         type="submit"
-        class="sm-admin-button"
+        class="
+          inline-flex items-center justify-center gap-[9px] rounded-[7px] border px-5 py-[13px] font-[inherit]
+          text-[18px] leading-6 font-semibold whitespace-nowrap cursor-pointer transition-colors duration-150 max-md:px-4
+          max-md:py-2.5 max-md:text-sm border-primary bg-primary text-white hover:bg-primary-hover [&_.iconify]:size-5
+        "
         :disabled="saving"
       >
         {{

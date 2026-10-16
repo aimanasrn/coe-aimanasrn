@@ -52,7 +52,12 @@ async function deleteProduct() {
     <button
       ref="trigger"
       type="button"
-      class="sm-admin-row-action sm-admin-row-action-danger"
+      class="
+        inline-flex size-10 shrink-0 items-center justify-center rounded-md border border-[#dce4df] bg-white p-2.5
+        text-[#374f40] cursor-pointer transition-colors duration-150 hover:border-danger hover:bg-danger
+        hover:text-white focus-visible:border-danger focus-visible:bg-danger focus-visible:text-white
+        focus-visible:outline-2 focus-visible:outline-danger focus-visible:outline-offset-2 [&_.iconify]:size-[18px]
+      "
       :aria-label="`Delete ${product.name}`"
       aria-haspopup="dialog"
       :aria-expanded="open"
@@ -71,11 +76,11 @@ async function deleteProduct() {
     description="Remove this product from your StudyMart catalog."
     :dismissible="!busy"
     :close="!busy"
-    :ui="{ content: 'sm-admin-modal', title: 'sm-admin-modal-title' }"
+    :ui="{ content: 'max-w-[560px] rounded-[10px] bg-white font-sans text-[#37463f] [&_button:focus-visible]:outline-2 [&_button:focus-visible]:outline-primary [&_button:focus-visible]:outline-offset-4 [&_button:disabled]:opacity-50 [&_button:disabled]:cursor-not-allowed', title: 'text-2xl font-[650] text-heading' }"
     @after:leave="trigger?.focus()"
   >
     <template #body>
-      <div class="sm-admin-form">
+      <div class="flex flex-col gap-5">
         <p>
           Delete
           <strong>{{ product.name }}</strong>
@@ -83,15 +88,19 @@ async function deleteProduct() {
         </p>
         <p
           v-if="message"
-          class="sm-admin-notice sm-admin-notice-error"
+          class="mb-5 rounded-[7px] border px-[18px] py-3.5 text-sm border-[#f0d5d5] bg-[#fff4f4] text-[#a03939]"
           role="alert"
         >
           {{ message }}
         </p>
-        <div class="sm-admin-form-actions">
+        <div class="flex justify-end gap-3 pt-[5px]">
           <button
             type="button"
-            class="sm-admin-button-secondary"
+            class="
+              inline-flex items-center justify-center gap-[9px] rounded-[7px] border px-5 py-[13px] font-[inherit]
+              text-[18px] leading-6 font-semibold whitespace-nowrap cursor-pointer transition-colors duration-150 max-md:px-4
+              max-md:py-2.5 max-md:text-sm border-[#dce4df] bg-white text-[#37463f] hover:bg-surface-muted
+            "
             :disabled="busy"
             @click="open = false"
           >
@@ -99,7 +108,11 @@ async function deleteProduct() {
           </button>
           <button
             type="button"
-            class="sm-admin-button sm-admin-button-danger"
+            class="
+              inline-flex items-center justify-center gap-[9px] rounded-[7px] border px-5 py-[13px] font-[inherit]
+              text-[18px] leading-6 font-semibold whitespace-nowrap cursor-pointer transition-colors duration-150 max-md:px-4
+              max-md:py-2.5 max-md:text-sm border-primary bg-danger text-white hover:bg-red-700 [&_.iconify]:size-5
+            "
             :disabled="busy"
             @click="deleteProduct"
           >

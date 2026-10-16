@@ -70,11 +70,17 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="sm-product-upload">
+  <div class="flex flex-col gap-[18px]">
     <label
       :for="inputId"
-      class="sm-product-dropzone"
-      :class="{ 'is-dragging': dragging, 'is-disabled': disabled }"
+      class="
+        relative flex min-h-[220px] cursor-pointer flex-col items-center justify-center gap-3.5 rounded-[7px] border-2
+        border-dashed border-[#dce4df] px-[18px] py-7 text-center hover:border-primary hover:bg-[#f4fbf6]
+        focus-within:border-primary focus-within:bg-[#f4fbf6] max-md:min-h-[190px] [&>.iconify]:size-10
+        [&>.iconify]:text-primary [&_strong]:text-sm [&_strong]:font-[550] [&_strong]:text-[#374f40]
+        [&>span:last-child]:text-xs [&>span:last-child]:leading-[1.6] [&>span:last-child]:text-[#89928c]
+      "
+      :class="{ 'border-primary! bg-[#f4fbf6]': dragging, 'opacity-50 cursor-not-allowed!': disabled }"
       @dragover.prevent="dragging = !disabled"
       @dragleave.prevent="dragging = false"
       @drop.prevent="dropped"
@@ -99,7 +105,16 @@ onBeforeUnmount(() => {
     </label>
     <div
       v-if="entries.length"
-      class="sm-product-image-previews"
+      class="
+        grid grid-cols-3 gap-3 [&_figure]:min-w-0 [&_figure>div]:relative [&_figure>div]:aspect-square
+        [&_figure>div]:rounded-md [&_figure>div]:border [&_figure>div]:border-[#dce4df] [&_figure>div]:bg-[#f2f5f3]
+        [&_img]:size-full [&_img]:rounded-md [&_img]:object-cover [&_button]:absolute [&_button]:top-[5px]
+        [&_button]:right-[5px] [&_button]:grid [&_button]:size-[25px] [&_button]:cursor-pointer
+        [&_button]:place-items-center [&_button]:rounded-full [&_button]:border [&_button]:border-[#dce4df]
+        [&_button]:bg-white [&_button]:text-[#374f40] [&_button]:hover:bg-[#fff4f4] [&_button]:hover:text-danger
+        [&_button_.iconify]:size-3.5 [&_figcaption]:pt-[7px] [&_figcaption]:text-center [&_figcaption]:text-xs
+        [&_figcaption]:text-[#66746c]
+      "
     >
       <figure
         v-for="(image, index) in entries"
@@ -126,6 +141,6 @@ onBeforeUnmount(() => {
         <figcaption v-if="index === 0">Cover</figcaption>
       </figure>
     </div>
-    <p class="sm-admin-muted">The first image is used as the cover.</p>
+    <p class="text-sm text-[#7b867f]">The first image is used as the cover.</p>
   </div>
 </template>

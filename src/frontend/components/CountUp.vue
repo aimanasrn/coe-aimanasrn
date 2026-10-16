@@ -85,16 +85,16 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <span class="count-up">
+  <span class="inline-grid max-w-full align-top tabular-nums">
     <span
-      class="count-up-value"
+      class="col-start-1 row-start-1"
       aria-hidden="true"
     >
       {{ formatValue(displayed) }}
     </span>
     <!-- Reserve the final size so counting does not move surrounding content. -->
     <span
-      class="count-up-sizer"
+      class="invisible col-start-1 row-start-1"
       aria-hidden="true"
     >
       {{ formatValue(target) }}
@@ -102,21 +102,3 @@ onBeforeUnmount(() => {
     <span class="sr-only">{{ formatValue(target) }}</span>
   </span>
 </template>
-
-<style scoped>
-.count-up {
-  display: inline-grid;
-  max-width: 100%;
-  vertical-align: top;
-  font-variant-numeric: tabular-nums;
-}
-
-.count-up-value,
-.count-up-sizer {
-  grid-area: 1 / 1;
-}
-
-.count-up-sizer {
-  visibility: hidden;
-}
-</style>

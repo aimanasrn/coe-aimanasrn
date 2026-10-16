@@ -35,6 +35,11 @@ export interface ProductImageEntry {
   file?: File
 }
 export type StockFilter = 'all' | 'low' | 'out'
+export type ProductSortColumn = 'id' | 'name' | 'price' | 'stock_quantity'
+export interface ProductSort {
+  column: ProductSortColumn
+  direction: 'asc' | 'desc'
+}
 export interface DashboardData {
   summary: {
     total_products: number
@@ -52,6 +57,7 @@ export interface ProductPage {
   data: Product[]
   total: number
   current_page: number
+  per_page: number
   last_page: number
   low_stock_threshold: number
 }

@@ -96,7 +96,7 @@ async function deleteCategory() {
     :description="descriptions[mode]"
     :dismissible="!busy"
     :close="!busy"
-    :ui="{ content: 'sm-admin-modal', title: 'sm-admin-modal-title' }"
+    :ui="{ content: 'max-w-[560px] rounded-[10px] bg-white font-sans text-[#37463f] [&_button:focus-visible]:outline-2 [&_button:focus-visible]:outline-primary [&_button:focus-visible]:outline-offset-4 [&_button:disabled]:opacity-50 [&_button:disabled]:cursor-not-allowed', title: 'text-2xl font-[650] text-heading' }"
     @update:open="close"
     @after:leave="emit('closed')"
   >
@@ -111,9 +111,9 @@ async function deleteCategory() {
       />
       <div
         v-else-if="category && mode === 'view'"
-        class="sm-admin-form"
+        class="flex flex-col gap-5"
       >
-        <dl class="sm-category-details">
+        <dl class="grid gap-5 [&_dt]:mb-[5px] [&_dt]:text-[13px] [&_dt]:text-[#7b867f] [&_dd]:m-0 [&_dd]:max-h-60 [&_dd]:overflow-y-auto [&_dd]:text-heading [&_dd]:whitespace-pre-wrap [&_dd]:wrap-anywhere">
           <div>
             <dt>Category name</dt>
             <dd>{{ category.name }}</dd>
@@ -129,17 +129,25 @@ async function deleteCategory() {
             <dd>{{ (category.products_count ?? 0).toLocaleString() }}</dd>
           </div>
         </dl>
-        <div class="sm-admin-form-actions">
+        <div class="flex justify-end gap-3 pt-[5px]">
           <button
             type="button"
-            class="sm-admin-button-secondary"
+            class="
+              inline-flex items-center justify-center gap-[9px] rounded-[7px] border px-5 py-[13px] font-[inherit]
+              text-[18px] leading-6 font-semibold whitespace-nowrap cursor-pointer transition-colors duration-150 max-md:px-4
+              max-md:py-2.5 max-md:text-sm border-[#dce4df] bg-white text-[#37463f] hover:bg-surface-muted
+            "
             @click="close()"
           >
             Close
           </button>
           <button
             type="button"
-            class="sm-admin-button"
+            class="
+              inline-flex items-center justify-center gap-[9px] rounded-[7px] border px-5 py-[13px] font-[inherit]
+              text-[18px] leading-6 font-semibold whitespace-nowrap cursor-pointer transition-colors duration-150 max-md:px-4
+              max-md:py-2.5 max-md:text-sm border-primary bg-primary text-white hover:bg-primary-hover [&_.iconify]:size-5
+            "
             @click="emit('edit', category)"
           >
             Edit category
@@ -148,7 +156,7 @@ async function deleteCategory() {
       </div>
       <div
         v-else-if="category"
-        class="sm-admin-form"
+        class="flex flex-col gap-5"
       >
         <p>
           Delete
@@ -157,7 +165,7 @@ async function deleteCategory() {
         </p>
         <p
           v-if="hasProducts"
-          class="sm-admin-notice sm-category-warning"
+          class="mb-5 rounded-[7px] border px-[18px] py-3.5 text-sm border-[#fde68a] bg-[#fffbeb] text-[#92400e]"
           role="status"
         >
           This category contains {{ category.products_count }}
@@ -166,15 +174,19 @@ async function deleteCategory() {
         </p>
         <p
           v-if="message"
-          class="sm-admin-notice sm-admin-notice-error"
+          class="mb-5 rounded-[7px] border px-[18px] py-3.5 text-sm border-[#f0d5d5] bg-[#fff4f4] text-[#a03939]"
           role="alert"
         >
           {{ message }}
         </p>
-        <div class="sm-admin-form-actions">
+        <div class="flex justify-end gap-3 pt-[5px]">
           <button
             type="button"
-            class="sm-admin-button-secondary"
+            class="
+              inline-flex items-center justify-center gap-[9px] rounded-[7px] border px-5 py-[13px] font-[inherit]
+              text-[18px] leading-6 font-semibold whitespace-nowrap cursor-pointer transition-colors duration-150 max-md:px-4
+              max-md:py-2.5 max-md:text-sm border-[#dce4df] bg-white text-[#37463f] hover:bg-surface-muted
+            "
             :disabled="busy"
             @click="close()"
           >
@@ -182,7 +194,11 @@ async function deleteCategory() {
           </button>
           <button
             type="button"
-            class="sm-admin-button sm-admin-button-danger"
+            class="
+              inline-flex items-center justify-center gap-[9px] rounded-[7px] border px-5 py-[13px] font-[inherit]
+              text-[18px] leading-6 font-semibold whitespace-nowrap cursor-pointer transition-colors duration-150 max-md:px-4
+              max-md:py-2.5 max-md:text-sm border-primary bg-danger text-white hover:bg-red-700 [&_.iconify]:size-5
+            "
             :disabled="busy || hasProducts"
             @click="deleteCategory"
           >

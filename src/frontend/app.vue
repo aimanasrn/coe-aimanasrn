@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import '~/assets/css/notifications.css'
-</script>
-
 <template>
   <UApp
     :tooltip="{ delayDuration: 200 }"

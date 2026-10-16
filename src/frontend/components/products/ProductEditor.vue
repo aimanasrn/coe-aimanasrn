@@ -31,7 +31,7 @@ function cancel() {
       :mode="editing ? 'edit' : 'add'"
       :product="product"
     />
-    <header class="sm-product-header">
+    <header class="mb-[30px] flex items-start justify-between gap-6 max-md:flex-col max-md:gap-5 [&_h1]:text-[clamp(26px,2.4vw,36px)] [&_h1]:leading-[1.25] [&_h1]:font-bold [&_h1]:tracking-[-1px] [&_h1]:text-heading [&_h1]:wrap-anywhere [&_h1]:max-md:text-[28px] [&_p]:mt-2 [&_p]:text-base [&_p]:leading-[1.6] [&_p]:text-[#6b7871]">
       <div>
         <h1>{{ editing ? 'Edit product' : 'Add product' }}</h1>
         <p>

@@ -23,7 +23,11 @@ const isMenuOpen = ref(false)
     <button
       type="button"
       aria-label="Open navigation"
-      class="fixed left-4 top-4 z-40 inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium text-heading shadow-sm hover:bg-secondary focus-visible:outline-2 focus-visible:outline-ring md:hidden"
+      class="
+        fixed left-4 top-4 z-40 inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2
+        text-sm font-medium text-heading shadow-sm hover:bg-secondary focus-visible:outline-2
+        focus-visible:outline-ring md:hidden
+      "
     >
       <UIcon
         name="i-lucide-menu"

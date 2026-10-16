@@ -21,12 +21,16 @@ class ProductController extends Controller
         $filters = $request->validate([
             'q' => ['nullable', 'string', 'max:150'],
             'stock' => ['nullable', Rule::in(['all', 'low', 'out'])],
+            'per_page' => ['sometimes', 'integer', Rule::in([5, 10, 15, 20, 25, 50])],
+            'sort_by' => ['sometimes', Rule::in(['id', 'name', 'price', 'stock_quantity'])],
+            'sort_direction' => ['sometimes', Rule::in(['asc', 'desc'])],
         ]);
 
         $products = Product::with('category')
             ->forInventory($filters['q'] ?? null, $filters['stock'] ?? 'all')
+            ->orderBy($filters['sort_by'] ?? 'id', $filters['sort_direction'] ?? 'asc')
             ->orderBy('id')
-            ->paginate(10);
+            ->paginate((int) ($filters['per_page'] ?? 10));
 
         return response()->json(array_merge($products->toArray(), [
             'low_stock_threshold' => Product::LOW_STOCK_THRESHOLD,

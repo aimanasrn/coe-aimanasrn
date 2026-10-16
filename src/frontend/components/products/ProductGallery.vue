@@ -17,10 +17,10 @@ watch(active, () => {
 
 <template>
   <section
-    class="sm-product-gallery"
+    class="min-w-0 rounded-[10px] border border-[#e0e6e2] bg-white p-4 max-md:p-[18px]"
     aria-label="Product images"
   >
-    <div class="sm-product-gallery-stage">
+    <div class="grid aspect-square place-items-center overflow-hidden rounded-[7px] bg-[#f2f5f3] max-[1101px]:aspect-[1.2] max-[1101px]:max-h-[480px] max-md:aspect-square [&>img]:block [&>img]:size-full [&>img]:object-contain">
       <img
         v-if="images.length && !failed"
         :key="images[active]"
@@ -30,7 +30,11 @@ watch(active, () => {
       />
       <div
         v-else
-        class="sm-product-no-image"
+        class="
+          flex flex-col items-center gap-3 px-[22px] py-8 text-center [&>.iconify]:size-[52px]
+          [&>.iconify]:text-[#98ada0] [&_strong]:text-[17px] [&_strong]:text-[#374f40] [&_p]:max-w-[260px] [&_p]:text-sm
+          [&_p]:leading-[1.6] [&_p]:text-[#7b867f]
+        "
       >
         <UIcon
           name="i-lucide-image"
@@ -49,7 +53,10 @@ watch(active, () => {
         </p>
         <NuxtLink
           :to="editTo"
-          class="sm-admin-link"
+          class="
+            inline-flex items-center gap-[9px] text-[15px] font-[550] text-primary cursor-pointer hover:text-primary-hover
+            hover:underline hover:underline-offset-4 [&_.iconify]:size-[18px] [&_.iconify]:shrink-0
+          "
         >
           {{ failed ? 'Edit images' : 'Add images' }}
         </NuxtLink>
@@ -57,7 +64,12 @@ watch(active, () => {
     </div>
     <div
       v-if="images.length > 1"
-      class="sm-product-gallery-thumbnails"
+      class="
+        flex gap-3 overflow-x-auto px-0.5 pt-3.5 pb-0.5 [&_button]:size-[88px] [&_button]:shrink-0
+        [&_button]:cursor-pointer [&_button]:rounded-[7px] [&_button]:border [&_button]:border-[#dce4df]
+        [&_button]:bg-white [&_button]:p-[3px] [&_button]:aria-pressed:border-2 [&_button]:aria-pressed:border-primary
+        [&_img]:size-full [&_img]:rounded [&_img]:object-cover
+      "
     >
       <button
         v-for="(image, index) in images"

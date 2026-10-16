@@ -97,14 +97,14 @@ async function submit() {
     :validate="validate"
     :validate-on="['blur', 'change', 'input']"
     :disabled="saving"
-    class="sm-admin-form"
+    class="flex flex-col gap-5"
     novalidate
     @submit="submit"
     @error="invalid"
   >
     <p
       v-if="message"
-      class="sm-admin-notice sm-admin-notice-error"
+      class="mb-5 rounded-[7px] border px-[18px] py-3.5 text-sm border-[#f0d5d5] bg-[#fff4f4] text-[#a03939]"
       role="alert"
     >
       {{ message }}
@@ -113,7 +113,21 @@ async function submit() {
       name="name"
       label="Category name"
       required
-      class="sm-admin-field"
+      class="
+        flex flex-col gap-[7px] [&_label]:text-sm [&_label]:font-[550] [&_label]:text-[#374f40]
+        [&_label_span]:font-normal [&_label_span]:text-[#7b867f] [&_input]:min-h-11 [&_input]:w-full
+        [&_input]:rounded-md [&_input]:border [&_input]:border-[#dce4df] [&_input]:bg-white [&_input]:px-3
+        [&_input]:py-2.5 [&_input]:font-[inherit] [&_input]:text-[15px] [&_input]:text-[#37463f]
+        [&_input]:focus:outline-2 [&_input]:focus:outline-primary [&_input]:focus:outline-offset-1
+        [&_textarea]:min-h-11 [&_textarea]:w-full [&_textarea]:rounded-md [&_textarea]:border
+        [&_textarea]:border-[#dce4df] [&_textarea]:bg-white [&_textarea]:px-3 [&_textarea]:py-2.5
+        [&_textarea]:font-[inherit] [&_textarea]:text-[15px] [&_textarea]:text-[#37463f] [&_textarea]:focus:outline-2
+        [&_textarea]:focus:outline-primary [&_textarea]:focus:outline-offset-1 [&_select]:min-h-11 [&_select]:w-full
+        [&_select]:rounded-md [&_select]:border [&_select]:border-[#dce4df] [&_select]:bg-white [&_select]:px-3
+        [&_select]:py-2.5 [&_select]:font-[inherit] [&_select]:text-[15px] [&_select]:text-[#37463f]
+        [&_select]:focus:outline-2 [&_select]:focus:outline-primary [&_select]:focus:outline-offset-1
+        [&_[aria-invalid=true]]:border-[#b83d3d] [&>p]:text-xs [&>p]:text-[#b83d3d]
+      "
     >
       <UInput
         id="category-name"
@@ -126,7 +140,21 @@ async function submit() {
     </UFormField>
     <UFormField
       name="description"
-      class="sm-admin-field"
+      class="
+        flex flex-col gap-[7px] [&_label]:text-sm [&_label]:font-[550] [&_label]:text-[#374f40]
+        [&_label_span]:font-normal [&_label_span]:text-[#7b867f] [&_input]:min-h-11 [&_input]:w-full
+        [&_input]:rounded-md [&_input]:border [&_input]:border-[#dce4df] [&_input]:bg-white [&_input]:px-3
+        [&_input]:py-2.5 [&_input]:font-[inherit] [&_input]:text-[15px] [&_input]:text-[#37463f]
+        [&_input]:focus:outline-2 [&_input]:focus:outline-primary [&_input]:focus:outline-offset-1
+        [&_textarea]:min-h-11 [&_textarea]:w-full [&_textarea]:rounded-md [&_textarea]:border
+        [&_textarea]:border-[#dce4df] [&_textarea]:bg-white [&_textarea]:px-3 [&_textarea]:py-2.5
+        [&_textarea]:font-[inherit] [&_textarea]:text-[15px] [&_textarea]:text-[#37463f] [&_textarea]:focus:outline-2
+        [&_textarea]:focus:outline-primary [&_textarea]:focus:outline-offset-1 [&_select]:min-h-11 [&_select]:w-full
+        [&_select]:rounded-md [&_select]:border [&_select]:border-[#dce4df] [&_select]:bg-white [&_select]:px-3
+        [&_select]:py-2.5 [&_select]:font-[inherit] [&_select]:text-[15px] [&_select]:text-[#37463f]
+        [&_select]:focus:outline-2 [&_select]:focus:outline-primary [&_select]:focus:outline-offset-1
+        [&_[aria-invalid=true]]:border-[#b83d3d] [&>p]:text-xs [&>p]:text-[#b83d3d]
+      "
     >
       <template #label>
         Description
@@ -140,10 +168,14 @@ async function submit() {
         class="w-full"
       />
     </UFormField>
-    <div class="sm-admin-form-actions">
+    <div class="flex justify-end gap-3 pt-[5px]">
       <button
         type="button"
-        class="sm-admin-button-secondary"
+        class="
+          inline-flex items-center justify-center gap-[9px] rounded-[7px] border px-5 py-[13px] font-[inherit]
+          text-[18px] leading-6 font-semibold whitespace-nowrap cursor-pointer transition-colors duration-150 max-md:px-4
+          max-md:py-2.5 max-md:text-sm border-[#dce4df] bg-white text-[#37463f] hover:bg-surface-muted
+        "
         :disabled="saving"
         @click="emit('cancel')"
       >
@@ -151,7 +183,11 @@ async function submit() {
       </button>
       <button
         type="submit"
-        class="sm-admin-button"
+        class="
+          inline-flex items-center justify-center gap-[9px] rounded-[7px] border px-5 py-[13px] font-[inherit]
+          text-[18px] leading-6 font-semibold whitespace-nowrap cursor-pointer transition-colors duration-150 max-md:px-4
+          max-md:py-2.5 max-md:text-sm border-primary bg-primary text-white hover:bg-primary-hover [&_.iconify]:size-5
+        "
         :disabled="saving"
       >
         {{
