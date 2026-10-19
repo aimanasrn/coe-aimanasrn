@@ -1,28 +1,58 @@
-@import "tailwindcss";
-@import "@nuxt/ui";
+@import 'tailwindcss';
+@import '@nuxt/ui';
+
+@font-face {
+  font-family: 'Nunito';
+  src: url('/fonts/nunito-variable.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 200 1000;
+  font-display: swap;
+}
+
+:root {
+  --ui-primary: #21684c;
+  --ui-text: #47534e;
+  --ui-text-muted: #747e7a;
+  --ui-text-dimmed: #939c97;
+  --ui-text-highlighted: #182322;
+  --ui-bg: #ffffff;
+  --ui-bg-muted: #f7f9f8;
+  --ui-bg-elevated: #ffffff;
+  --ui-border: #e2e8e5;
+  --ui-border-muted: #edf0ee;
+  --ui-border-accented: #cdd8d1;
+}
 
 @theme {
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.5;
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: 1.5;
+  --text-lg: 1.25rem;
+  --text-xl: 1.375rem;
+
   /* Brand — buttons, links, active navigation */
-  --color-primary: #15803d;
-  --color-primary-hover: #166534;
+  --font-sans: Arial, Helvetica, sans-serif;
+  --color-primary: #21684c;
+  --color-primary-hover: #18543d;
   --color-primary-light: #dcfce7;
   --color-primary-foreground: #ffffff;
 
   /* Backgrounds — pages, cards, highlighted sections */
   --color-background: #ffffff;
   --color-surface: #ffffff;
-  --color-surface-muted: #f8faf9;
-  --color-secondary: #effcf6;
+  --color-surface-muted: #f7f9f8;
+  --color-secondary: #edf5f0;
   --color-secondary-foreground: #14532d;
 
   /* Text */
-  --color-heading: #102d23;
-  --color-body: #374151;
-  --color-muted: #6b7280;
+  --color-heading: #182322;
+  --color-body: #47534e;
+  --color-muted: #747e7a;
 
   /* Borders and keyboard focus */
-  --color-border: #e5e7eb;
-  --color-ring: #15803d;
+  --color-border: #e2e8e5;
+  --color-ring: #21684c;
 
   /* Footer */
   --color-footer: #0d3528;
@@ -51,9 +81,15 @@
 @layer base {
   body {
     @apply bg-background text-body;
+    -webkit-font-smoothing: antialiased;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply text-heading;
   }
 }
@@ -65,26 +101,54 @@
   --animate-toast-leave: toast-leave 200ms ease-in forwards;
 
   @keyframes bag-bob {
-    0%, 100% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-4px) scale(1.035); }
+    0%,
+    100% {
+      transform: translateY(0) scale(1);
+    }
+    50% {
+      transform: translateY(-4px) scale(1.035);
+    }
   }
 
   @keyframes bag-shadow {
-    0%, 100% { transform: scaleX(1); opacity: 0.12; }
-    50% { transform: scaleX(0.8); opacity: 0.08; }
+    0%,
+    100% {
+      transform: scaleX(1);
+      opacity: 0.12;
+    }
+    50% {
+      transform: scaleX(0.8);
+      opacity: 0.08;
+    }
   }
 
   @keyframes loading-progress {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(250%); }
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(250%);
+    }
   }
 
   @keyframes toast-enter {
-    from { opacity: 0; translate: 0 -20px; scale: 0.95; }
-    to { opacity: 1; translate: 0 0; scale: 1; }
+    from {
+      opacity: 0;
+      translate: 0 -20px;
+      scale: 0.95;
+    }
+    to {
+      opacity: 1;
+      translate: 0 0;
+      scale: 1;
+    }
   }
 
   @keyframes toast-leave {
-    to { opacity: 0; translate: 80px 0; scale: 0.95; }
+    to {
+      opacity: 0;
+      translate: 80px 0;
+      scale: 0.95;
+    }
   }
 }

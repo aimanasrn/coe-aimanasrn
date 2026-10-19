@@ -1,11 +1,15 @@
 <script setup lang="ts">
-definePageMeta({
-  layout: false
-})
+  import { authDestination } from '~/utils/auth'
 
-await navigateTo('/admin', {
-  replace: true
-})
+  definePageMeta({
+    layout: false
+  })
+
+  const { fetchUser } = useAuth()
+  const account = await fetchUser()
+  await navigateTo(account ? authDestination(undefined, account.role) : '/login', {
+    replace: true
+  })
 </script>
 
 <template>

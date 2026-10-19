@@ -1,0 +1,10 @@
+**/node_modules/**
+**/vendor/**
+**/.nuxt/**
+**/.output/**
+**/storage/**
+**/bootstrap/cache/**
+**/public/**
+**/*lock*
+.env*
+output/**

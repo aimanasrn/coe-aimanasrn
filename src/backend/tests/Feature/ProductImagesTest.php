@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -16,6 +17,8 @@ class ProductImagesTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->withToken(auth('api')->login(User::factory()->admin()->create()));
 
         config(['filesystems.product_images_disk' => 'public']);
     }

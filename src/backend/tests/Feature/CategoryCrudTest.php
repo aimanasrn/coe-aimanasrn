@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
@@ -11,6 +12,13 @@ use Tests\TestCase;
 class CategoryCrudTest extends TestCase
 {
     use LazilyRefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->withToken(auth('api')->login(User::factory()->admin()->create()));
+    }
 
     public function test_creates_a_category_with_a_description_and_product_count(): void
     {

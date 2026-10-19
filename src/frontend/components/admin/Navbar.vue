@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import StudyMartLogo from '~/components/StudyMartLogo.vue'
+  import { ref } from 'vue'
+  import StudyMartLogo from '~/components/StudyMartLogo.vue'
 
-const isMenuOpen = ref(false)
+  const isMenuOpen = ref(false)
 
-const links = [
-  { label: 'Dashboard', to: '/admin' },
-  { label: 'Products', to: '/admin/products' },
-  { label: 'Categories', to: '/admin/categories' }
-]
+  const links = [
+    { label: 'Dashboard', to: '/admin' },
+    { label: 'Products', to: '/admin/products' },
+    { label: 'Categories', to: '/admin/categories' }
+  ]
 </script>
 
 <template>
@@ -63,9 +63,7 @@ const links = [
       <template #content>
         <div class="flex h-full w-full flex-col p-6">
           <!-- Drawer header -->
-          <div
-            class="flex items-center justify-between gap-3 border-b border-border pb-4"
-          >
+          <div class="flex items-center justify-between gap-3 border-b border-border pb-4">
             <div class="flex items-center gap-2">
               <!-- <UIcon
                 name="i-lucide-book-open"

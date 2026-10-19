@@ -10,7 +10,10 @@ export function useProducts(
     baseURL: useRuntimeConfig().public.apiBase,
     server: false,
     query: {
-      q: query, stock, page, per_page: itemsPerPage,
+      q: query,
+      stock,
+      page,
+      per_page: itemsPerPage,
       sort_by: computed(() => sort.value.column),
       sort_direction: computed(() => sort.value.direction)
     }

@@ -8,9 +8,12 @@ const icons: Record<ActionToastType, string> = {
 }
 
 const tones: Record<ActionToastType, string> = {
-  success: '[--toast-accent:#6ee7b7] [--toast-tint:rgb(16_185_129/0.16)] [--toast-border:rgb(52_211_153/0.4)]',
-  error: '[--toast-accent:#fda4af] [--toast-tint:rgb(244_63_94/0.16)] [--toast-border:rgb(251_113_133/0.4)]',
-  warning: '[--toast-accent:#fcd34d] [--toast-tint:rgb(245_158_11/0.16)] [--toast-border:rgb(251_191_36/0.4)]',
+  success:
+    '[--toast-accent:#6ee7b7] [--toast-tint:rgb(16_185_129/0.16)] [--toast-border:rgb(52_211_153/0.4)]',
+  error:
+    '[--toast-accent:#fda4af] [--toast-tint:rgb(244_63_94/0.16)] [--toast-border:rgb(251_113_133/0.4)]',
+  warning:
+    '[--toast-accent:#fcd34d] [--toast-tint:rgb(245_158_11/0.16)] [--toast-border:rgb(251_191_36/0.4)]',
   info: '[--toast-accent:#7dd3fc] [--toast-tint:rgb(14_165_233/0.16)] [--toast-border:rgb(56_189_248/0.4)]'
 }
 
@@ -44,19 +47,16 @@ export function useActionToast() {
         icon: 'size-9 text-(--toast-accent) bg-current [mask-size:20px_20px] [mask-position:center] [mask-repeat:no-repeat]',
         title: 'text-(--toast-accent) font-[650] leading-5 wrap-anywhere',
         description: 'text-[#cbd5e1] text-xs leading-[19px] wrap-anywhere',
-        close: 'text-[#94a3b8] cursor-pointer hover:text-white focus-visible:outline-2 focus-visible:outline-(--toast-accent) focus-visible:outline-offset-[3px] focus-visible:rounded'
+        close:
+          'text-[#94a3b8] cursor-pointer hover:text-white focus-visible:outline-2 focus-visible:outline-(--toast-accent) focus-visible:outline-offset-[3px] focus-visible:rounded'
       }
     })
   }
 
   return {
-    success: (title: string, description: string) =>
-      show('success', title, description),
-    error: (title: string, description: string) =>
-      show('error', title, description),
-    warning: (title: string, description: string) =>
-      show('warning', title, description),
-    info: (title: string, description: string) =>
-      show('info', title, description)
+    success: (title: string, description: string) => show('success', title, description),
+    error: (title: string, description: string) => show('error', title, description),
+    warning: (title: string, description: string) => show('warning', title, description),
+    info: (title: string, description: string) => show('info', title, description)
   }
 }

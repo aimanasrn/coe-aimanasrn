@@ -1,22 +1,18 @@
 <script setup lang="ts">
-import ProductEditor from '~/components/products/ProductEditor.vue'
-import ProductBreadcrumbs from '~/components/products/ProductBreadcrumbs.vue'
-import ProductLoadState from '~/components/products/ProductLoadState.vue'
+  import ProductEditor from '~/components/products/ProductEditor.vue'
+  import ProductBreadcrumbs from '~/components/products/ProductBreadcrumbs.vue'
+  import ProductLoadState from '~/components/products/ProductLoadState.vue'
 
-definePageMeta({ layout: 'admin' })
-const route = useRoute()
-const { data, status, error, refresh } = useProduct(() =>
-  String(route.params.id)
-)
-const product = computed(() => data.value?.data)
-const loading = computed(
-  () => status.value === 'idle' || status.value === 'pending'
-)
-useHead(() => ({
-  title: product.value
-    ? `Edit ${product.value.name} · StudyMart Admin`
-    : 'Edit product · StudyMart Admin'
-}))
+  definePageMeta({ layout: 'admin' })
+  const route = useRoute()
+  const { data, status, error, refresh } = useProduct(() => String(route.params.id))
+  const product = computed(() => data.value?.data)
+  const loading = computed(() => status.value === 'idle' || status.value === 'pending')
+  useHead(() => ({
+    title: product.value
+      ? `Edit ${product.value.name} · StudyMart Admin`
+      : 'Edit product · StudyMart Admin'
+  }))
 </script>
 
 <template>

@@ -1,92 +1,84 @@
 <script setup lang="ts">
-import type { Category, CategoryDialogMode } from '~/types/catalog'
-import CategoryForm from '~/components/admin/CategoryForm.vue'
+  import type { Category, CategoryDialogMode } from '~/types/catalog'
+  import CategoryForm from '~/components/admin/CategoryForm.vue'
 
-const open = defineModel<boolean>('open', { required: true })
-const props = defineProps<{
-  mode: CategoryDialogMode
-  category?: Category
-}>()
-const emit = defineEmits<{
-  saved: [category: Category]
-  deleted: []
-  edit: [category: Category]
-  closed: []
-}>()
-const config = useRuntimeConfig()
-const notification = useActionToast()
-const busy = ref(false)
-const message = ref('')
-const titles = {
-  add: 'Add category',
-  view: 'Category details',
-  edit: 'Edit category',
-  delete: 'Delete category'
-}
-const descriptions = {
-  add: 'Create a new group for your products.',
-  view: 'View this catalog group and its product count.',
-  edit: 'Update the category name and description.',
-  delete: 'Only categories without products can be deleted.'
-}
-const hasProducts = computed(() => (props.category?.products_count ?? 0) > 0)
-
-watch(open, () => {
-  message.value = ''
-})
-
-function close(value = false) {
-  if (busy.value) return
-  open.value = value
-  if (value || props.mode === 'view') return
-
-  notification.info(
-    props.mode === 'delete' ? 'Deletion cancelled' : 'Changes cancelled',
-    props.mode === 'delete'
-      ? 'The category was not deleted.'
-      : 'No category changes were saved.'
-  )
-}
-
-function saved(category: Category) {
-  open.value = false
-  emit('saved', category)
-}
-
-async function deleteCategory() {
-  if (busy.value || !props.category || hasProducts.value) return
-  busy.value = true
-  message.value = ''
-
-  try {
-    await $fetch(`/categories/${props.category.id}`, {
-      baseURL: config.public.apiBase,
-      method: 'DELETE'
-    })
-    notification.success(
-      'Category deleted',
-      `${props.category.name} has been removed from your catalog.`
-    )
-    open.value = false
-    emit('deleted')
-  } catch (error: unknown) {
-    const response = error as {
-      statusCode?: number
-      data?: { message?: string }
-    }
-    if (response.statusCode === 409) {
-      message.value =
-        response.data?.message ??
-        'Move this category’s products to another category before deleting it.'
-      notification.warning('Category is in use', message.value)
-    } else {
-      message.value = 'We could not delete this category. Please try again.'
-      notification.error('Category was not deleted', message.value)
-    }
-  } finally {
-    busy.value = false
+  const open = defineModel<boolean>('open', { required: true })
+  const props = defineProps<{
+    mode: CategoryDialogMode
+    category?: Category
+  }>()
+  const emit = defineEmits<{
+    saved: [category: Category]
+    deleted: []
+    edit: [category: Category]
+    closed: []
+  }>()
+  const config = useRuntimeConfig()
+  const notification = useActionToast()
+  const busy = ref(false)
+  const titles = {
+    add: 'Add category',
+    view: 'Category details',
+    edit: 'Edit category',
+    delete: 'Delete category'
   }
-}
+  const descriptions = {
+    add: 'Create a new group for your products.',
+    view: 'View this catalog group and its product count.',
+    edit: 'Update the category name and description.',
+    delete: 'Only categories without products can be deleted.'
+  }
+  const hasProducts = computed(() => (props.category?.products_count ?? 0) > 0)
+
+  function close(value = false) {
+    if (busy.value) return
+    open.value = value
+    if (value || props.mode === 'view') return
+
+    notification.info(
+      props.mode === 'delete' ? 'Deletion cancelled' : 'Changes cancelled',
+      props.mode === 'delete' ? 'The category was not deleted.' : 'No category changes were saved.'
+    )
+  }
+
+  function saved(category: Category) {
+    open.value = false
+    emit('saved', category)
+  }
+
+  async function deleteCategory() {
+    if (busy.value || !props.category || hasProducts.value) return
+    busy.value = true
+
+    try {
+      await $fetch(`/categories/${props.category.id}`, {
+        baseURL: config.public.apiBase,
+        method: 'DELETE'
+      })
+      notification.success(
+        'Category deleted',
+        `${props.category.name} has been removed from your catalog.`
+      )
+      open.value = false
+      emit('deleted')
+    } catch (error: unknown) {
+      const response = error as {
+        statusCode?: number
+        data?: { message?: string }
+      }
+      if (response.statusCode === 409) {
+        const message =
+          response.data?.message ??
+          'Move this category’s products to another category before deleting it.'
+        notification.warning('Category is in use', message)
+      } else {
+        const message = 'We could not delete this category. Please try again.'
+        notification.error('Category was not deleted', message)
+      }
+    } finally {
+      busy.value = false
+    }
+  }
 </script>
 
 <template>
@@ -96,7 +88,11 @@ async function deleteCategory() {
     :description="descriptions[mode]"
     :dismissible="!busy"
     :close="!busy"
-    :ui="{ content: 'max-w-[560px] rounded-[10px] bg-white font-sans text-[#37463f] [&_button:focus-visible]:outline-2 [&_button:focus-visible]:outline-primary [&_button:focus-visible]:outline-offset-4 [&_button:disabled]:opacity-50 [&_button:disabled]:cursor-not-allowed', title: 'text-2xl font-[650] text-heading' }"
+    :ui="{
+      content: 'catalog-dialog',
+      overlay: 'bg-[#10251c]/35 backdrop-blur-[2px]',
+      title: 'catalog-dialog__title'
+    }"
     @update:open="close"
     @after:leave="emit('closed')"
   >
@@ -113,7 +109,9 @@ async function deleteCategory() {
         v-else-if="category && mode === 'view'"
         class="flex flex-col gap-5"
       >
-        <dl class="grid gap-5 [&_dt]:mb-[5px] [&_dt]:text-[13px] [&_dt]:text-[#7b867f] [&_dd]:m-0 [&_dd]:max-h-60 [&_dd]:overflow-y-auto [&_dd]:text-heading [&_dd]:whitespace-pre-wrap [&_dd]:wrap-anywhere">
+        <dl
+          class="grid gap-5 [&_dt]:mb-[5px] [&_dt]:text-[13px] [&_dt]:text-[#7b867f] [&_dd]:m-0 [&_dd]:max-h-60 [&_dd]:overflow-y-auto [&_dd]:text-heading [&_dd]:whitespace-pre-wrap [&_dd]:wrap-anywhere"
+        >
           <div>
             <dt>Category name</dt>
             <dd>{{ category.name }}</dd>
@@ -132,22 +130,14 @@ async function deleteCategory() {
         <div class="flex justify-end gap-3 pt-[5px]">
           <button
             type="button"
-            class="
-              inline-flex items-center justify-center gap-[9px] rounded-[7px] border px-5 py-[13px] font-[inherit]
-              text-[18px] leading-6 font-semibold whitespace-nowrap cursor-pointer transition-colors duration-150 max-md:px-4
-              max-md:py-2.5 max-md:text-sm border-[#dce4df] bg-white text-[#37463f] hover:bg-surface-muted
-            "
+            class="catalog-button catalog-button--secondary"
             @click="close()"
           >
             Close
           </button>
           <button
             type="button"
-            class="
-              inline-flex items-center justify-center gap-[9px] rounded-[7px] border px-5 py-[13px] font-[inherit]
-              text-[18px] leading-6 font-semibold whitespace-nowrap cursor-pointer transition-colors duration-150 max-md:px-4
-              max-md:py-2.5 max-md:text-sm border-primary bg-primary text-white hover:bg-primary-hover [&_.iconify]:size-5
-            "
+            class="catalog-button catalog-button--primary"
             @click="emit('edit', category)"
           >
             Edit category
@@ -169,24 +159,13 @@ async function deleteCategory() {
           role="status"
         >
           This category contains {{ category.products_count }}
-          {{ category.products_count === 1 ? 'product' : 'products' }}. Move
-          them to another category before deleting it.
-        </p>
-        <p
-          v-if="message"
-          class="mb-5 rounded-[7px] border px-[18px] py-3.5 text-sm border-[#f0d5d5] bg-[#fff4f4] text-[#a03939]"
-          role="alert"
-        >
-          {{ message }}
+          {{ category.products_count === 1 ? 'product' : 'products' }}. Move them to another
+          category before deleting it.
         </p>
         <div class="flex justify-end gap-3 pt-[5px]">
           <button
             type="button"
-            class="
-              inline-flex items-center justify-center gap-[9px] rounded-[7px] border px-5 py-[13px] font-[inherit]
-              text-[18px] leading-6 font-semibold whitespace-nowrap cursor-pointer transition-colors duration-150 max-md:px-4
-              max-md:py-2.5 max-md:text-sm border-[#dce4df] bg-white text-[#37463f] hover:bg-surface-muted
-            "
+            class="catalog-button catalog-button--secondary"
             :disabled="busy"
             @click="close()"
           >
@@ -194,11 +173,7 @@ async function deleteCategory() {
           </button>
           <button
             type="button"
-            class="
-              inline-flex items-center justify-center gap-[9px] rounded-[7px] border px-5 py-[13px] font-[inherit]
-              text-[18px] leading-6 font-semibold whitespace-nowrap cursor-pointer transition-colors duration-150 max-md:px-4
-              max-md:py-2.5 max-md:text-sm border-primary bg-danger text-white hover:bg-red-700 [&_.iconify]:size-5
-            "
+            class="catalog-button catalog-button--danger"
             :disabled="busy || hasProducts"
             @click="deleteCategory"
           >

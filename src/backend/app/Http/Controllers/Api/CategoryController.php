@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\CatalogCache;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\JsonResponse;
@@ -13,9 +14,9 @@ class CategoryController extends Controller
 {
     public function index(): JsonResponse
     {
-        return response()->json([
-            'data' => Category::query()->withCount('products')->orderBy('name')->get(),
-        ]);
+        return response()->json(CatalogCache::remember('admin-categories', [], fn (): array => [
+            'data' => Category::query()->withCount('products')->orderBy('name')->get()->toArray(),
+        ]));
     }
 
     public function store(Request $request): JsonResponse

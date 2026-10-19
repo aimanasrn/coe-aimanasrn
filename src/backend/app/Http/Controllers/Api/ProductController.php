@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\CatalogCache;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
@@ -20,21 +21,24 @@ class ProductController extends Controller
     {
         $filters = $request->validate([
             'q' => ['nullable', 'string', 'max:150'],
+            'page' => ['sometimes', 'integer', 'min:1', 'max:10000'],
             'stock' => ['nullable', Rule::in(['all', 'low', 'out'])],
             'per_page' => ['sometimes', 'integer', Rule::in([5, 10, 15, 20, 25, 50])],
             'sort_by' => ['sometimes', Rule::in(['id', 'name', 'price', 'stock_quantity'])],
             'sort_direction' => ['sometimes', Rule::in(['asc', 'desc'])],
         ]);
 
-        $products = Product::with('category')
-            ->forInventory($filters['q'] ?? null, $filters['stock'] ?? 'all')
-            ->orderBy($filters['sort_by'] ?? 'id', $filters['sort_direction'] ?? 'asc')
-            ->orderBy('id')
-            ->paginate((int) ($filters['per_page'] ?? 10));
+        return response()->json(CatalogCache::remember('admin-products', array_merge($filters, ['page' => $request->integer('page', 1), 'url' => $request->url()]), function () use ($filters): array {
+            $products = Product::with('category')
+                ->forInventory($filters['q'] ?? null, $filters['stock'] ?? 'all')
+                ->orderBy($filters['sort_by'] ?? 'id', $filters['sort_direction'] ?? 'asc')
+                ->orderBy('id')
+                ->paginate((int) ($filters['per_page'] ?? 10));
 
-        return response()->json(array_merge($products->toArray(), [
-            'low_stock_threshold' => Product::LOW_STOCK_THRESHOLD,
-        ]));
+            return array_merge($products->toArray(), [
+                'low_stock_threshold' => Product::LOW_STOCK_THRESHOLD,
+            ]);
+        }));
     }
 
     public function store(Request $request): JsonResponse

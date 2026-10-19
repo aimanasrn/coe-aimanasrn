@@ -4,12 +4,20 @@ namespace Tests\Feature;
 
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Tests\TestCase;
 
 class CategoryControllerTest extends TestCase
 {
     use LazilyRefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->withToken(auth('api')->login(User::factory()->admin()->create()));
+    }
 
     public function test_lists_categories_alphabetically_including_empty_categories(): void
     {

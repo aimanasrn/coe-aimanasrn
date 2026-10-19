@@ -17,6 +17,8 @@ return [
 
     'product_images_disk' => env('PRODUCT_IMAGES_DISK', 'public'),
 
+    'profile_photos_disk' => env('PROFILE_PHOTOS_DISK', env('PRODUCT_IMAGES_DISK', 'public')),
+
     /*
     |--------------------------------------------------------------------------
     | Filesystem Disks
