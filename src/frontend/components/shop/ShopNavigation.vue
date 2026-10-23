@@ -1,5 +1,7 @@
 <script setup lang="ts">
   import StudyMartLogo from '~/components/StudyMartLogo.vue'
+import { useAuth } from "~/composables/useAuth"
+import { useCart } from "~/composables/useCart"
   const { user, logout } = useAuth()
   const { cart } = useCart()
   const cartCount = computed(() => cart.value?.item_count ?? 0)

@@ -1,5 +1,7 @@
 <script setup lang="ts">
   import ShopNavigation from '~/components/shop/ShopNavigation.vue'
+import { useAuth } from "~/composables/useAuth";
+import { useCart } from "~/composables/useCart";
   const { user } = useAuth()
   const { refresh } = useCart()
   await useAsyncData('cart-initial-' + user.value?.id, refresh)
