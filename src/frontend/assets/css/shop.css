@@ -39,6 +39,11 @@
   color: var(--ui-primary);
 }
 
+.shop-links .shop-cart-link {
+  justify-content: center;
+  min-width: 44px;
+}
+
 .shop-account {
   display: flex;
   align-items: center;

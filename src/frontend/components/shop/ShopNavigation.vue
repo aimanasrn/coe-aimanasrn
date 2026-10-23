@@ -60,17 +60,13 @@
             :text="cartCount"
             color="primary"
             size="3xl"
-            class="mr-2"
             :ui="{ base: 'h-5 min-w-5 px-1 text-[11px] font-semibold' }"
           >
-            <span class="inline-flex items-center gap-2">
-              <UIcon
-                name="i-lucide-shopping-cart"
-                class="size-5"
-                aria-hidden="true"
-              />
-              Cart
-            </span>
+            <UIcon
+              name="i-lucide-shopping-cart"
+              class="size-5"
+              aria-hidden="true"
+            />
           </UChip>
         </NuxtLink>
       </nav>
