@@ -10,6 +10,7 @@ export function useAuth() {
       useState('shopping-cart-' + user.value?.id).value = null
       useState('cart-error-' + user.value?.id).value = ''
       useState('cart-busy-' + user.value?.id).value = false
+      useState('cart-loading-' + user.value?.id).value = false
       user.value = null
     })
   }

@@ -2,8 +2,9 @@
   import type { ShopProduct } from '~/types/shop'
   definePageMeta({ layout: 'shop', colorMode: 'light' })
   const route = useRoute()
-  const { data, error, refresh } = await useFetch<{ data: ShopProduct }>(
-    () => '/api/shop/products/' + route.params.id
+  const { data, status, error, refresh } = useLazyFetch<{ data: ShopProduct }>(
+    () => '/api/shop/products/' + route.params.id,
+    { server: false }
   )
   const product = computed(() => data.value?.data)
   useHead(() => ({ title: (product.value?.name || 'Product') + ' · StudyMart' }))
@@ -30,33 +31,38 @@
   <section>
     <NuxtLink
       to="/shop"
-      class="shop-back"
+      class="inline-flex items-center gap-2 text-sm text-primary font-semibold"
       ><UIcon
+        class="w-4.5 h-4.5"
         name="i-lucide-arrow-left"
         aria-hidden="true"
       />Back to shop</NuxtLink
     >
     <div
-      v-if="error"
-      class="shop-empty"
+      v-if="error && status === 'error'"
+      class="
+        flex min-h-87.5 flex-col items-center justify-center text-center gap-4.5 py-10 px-4
+        [&_h2]:text-[24px] [&_h2]:leading-[1.4] [&_h2]:font-semibold [&_p]:text-muted
+        [&_p]:leading-[1.7]
+      "
       role="alert"
     >
       <h1>{{ error.statusCode === 404 ? 'Product not found' : 'Could not load this product' }}</h1>
-      <button
+      <AppButton
         v-if="error.statusCode !== 404"
-        class="catalog-button catalog-button--primary"
         @click="refresh()"
       >
         Try again
-      </button>
+      </AppButton>
     </div>
     <div
-      v-else-if="product"
-      class="shop-detail"
+      v-else-if="product && status !== 'pending'"
+      class="grid grid-cols-2 gap-16 mt-7.5 max-[1101px]:gap-8 max-[761px]:grid-cols-1 max-[761px]:gap-5"
     >
       <div>
-        <div class="shop-detail__image">
+        <div class="aspect-square bg-[#edf2ef] rounded-2xl grid place-items-center overflow-hidden">
           <img
+            class="w-full h-full object-contain"
             v-if="product.image_urls[selectedImage] && !failed"
             :src="product.image_urls[selectedImage]"
             :alt="product.name"
@@ -71,9 +77,13 @@
         </div>
         <div
           v-if="product.image_urls.length > 1"
-          class="shop-thumbnails"
+          class="flex gap-3 mt-4"
         >
           <button
+            class="
+              w-18 h-18 rounded-lg border-0.5 border-transparent p-[3px] cursor-pointer
+              aria-[pressed=true]:border-primary
+            "
             v-for="(image, index) in product.image_urls"
             :key="image"
             :aria-label="'View photo ' + (index + 1)"
@@ -81,30 +91,40 @@
             @click="selectedImage = index"
           >
             <img
+              class="w-full h-full rounded object-cover"
               :src="image"
               alt=""
             />
           </button>
         </div>
       </div>
-      <div class="shop-detail__info">
+      <div class="py-5 px-0 max-[761px]:py-2 max-[761px]:px-0">
         <p class="text-sm text-primary">{{ product.category?.name }}</p>
-        <h1>{{ product.name }}</h1>
-        <p class="shop-detail__price">RM {{ Number(product.price).toFixed(2) }}</p>
-        <p class="shop-description">
+        <h1
+          class="
+            text-[36px] leading-[1.2] font-[650] tracking-[-1px] text-heading wrap-anywhere mt-3
+            max-[761px]:text-[30px]
+          "
+        >
+          {{ product.name }}
+        </h1>
+        <p class="my-5.5 mx-0 text-primary font-[650] text-[28px]">
+          RM {{ Number(product.price).toFixed(2) }}
+        </p>
+        <p class="text-base leading-[1.8] whitespace-pre-wrap wrap-anywhere text-muted">
           {{ product.description || 'A new addition to your everyday study essentials.' }}
         </p>
         <dl
           v-if="product.brand || product.unit"
-          class="shop-facts"
+          class="my-6 mx-0 flex flex-wrap gap-8 text-[14px]"
         >
           <div v-if="product.brand">
-            <dt>Brand</dt>
-            <dd>{{ product.brand }}</dd>
+            <dt class="text-muted mb-[5px]">Brand</dt>
+            <dd class="text-heading capitalize">{{ product.brand }}</dd>
           </div>
           <div v-if="product.unit">
-            <dt>Sold by</dt>
-            <dd>{{ product.unit }}</dd>
+            <dt class="text-muted mb-[5px]">Sold by</dt>
+            <dd class="text-heading capitalize">{{ product.unit }}</dd>
           </div>
         </dl>
         <p
@@ -118,7 +138,7 @@
           }}
         </p>
         <form
-          class="shop-purchase"
+          class="grid gap-3 mt-6 pt-6 border-t border-border"
           @submit.prevent="add(product.id, quantity)"
         >
           <label
@@ -135,11 +155,10 @@
               :max="maxQuantity"
               required
               :disabled="busy || !maxQuantity"
-              class="shop-quantity-input"
+              class="w-20 p-3 border border-border bg-white rounded-lg text-base"
             />
-            <button
+            <AppButton
               type="submit"
-              class="catalog-button catalog-button--primary"
               :disabled="busy || !maxQuantity"
             >
               {{ busy ? 'Updating cart...' : 'Add to cart'
@@ -147,7 +166,7 @@
                 name="i-lucide-shopping-cart"
                 aria-hidden="true"
               />
-            </button>
+            </AppButton>
           </div>
           <p
             v-if="product.stock_quantity && !maxQuantity"
@@ -165,7 +184,11 @@
     </div>
     <div
       v-else
-      class="shop-empty"
+      class="
+        flex min-h-87.5 flex-col items-center justify-center text-center gap-4.5 py-10 px-4
+        [&_h2]:text-[24px] [&_h2]:leading-[1.4] [&_h2]:font-semibold [&_p]:text-muted
+        [&_p]:leading-[1.7]
+      "
     >
       <StudyMartLoader label="Loading product" />
     </div>

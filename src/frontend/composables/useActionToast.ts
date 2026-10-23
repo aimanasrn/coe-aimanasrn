@@ -1,10 +1,9 @@
-type ActionToastType = 'success' | 'error' | 'warning' | 'info'
+type ActionToastType = 'success' | 'error' | 'warning'
 
 const icons: Record<ActionToastType, string> = {
   success: 'i-lucide-circle-check',
   error: 'i-lucide-circle-x',
-  warning: 'i-lucide-triangle-alert',
-  info: 'i-lucide-info'
+  warning: 'i-lucide-triangle-alert'
 }
 
 const tones: Record<ActionToastType, string> = {
@@ -13,8 +12,7 @@ const tones: Record<ActionToastType, string> = {
   error:
     '[--toast-accent:#fda4af] [--toast-tint:rgb(244_63_94/0.16)] [--toast-border:rgb(251_113_133/0.4)]',
   warning:
-    '[--toast-accent:#fcd34d] [--toast-tint:rgb(245_158_11/0.16)] [--toast-border:rgb(251_191_36/0.4)]',
-  info: '[--toast-accent:#7dd3fc] [--toast-tint:rgb(14_165_233/0.16)] [--toast-border:rgb(56_189_248/0.4)]'
+    '[--toast-accent:#fcd34d] [--toast-tint:rgb(245_158_11/0.16)] [--toast-border:rgb(251_191_36/0.4)]'
 }
 
 export function useActionToast() {
@@ -26,7 +24,7 @@ export function useActionToast() {
       description,
       color: type,
       icon: icons[type],
-      duration: type === 'error' ? 7000 : 5000,
+      duration: 3000,
       close: true,
       progress: {
         ui: {
@@ -56,7 +54,6 @@ export function useActionToast() {
   return {
     success: (title: string, description: string) => show('success', title, description),
     error: (title: string, description: string) => show('error', title, description),
-    warning: (title: string, description: string) => show('warning', title, description),
-    info: (title: string, description: string) => show('info', title, description)
+    warning: (title: string, description: string) => show('warning', title, description)
   }
 }

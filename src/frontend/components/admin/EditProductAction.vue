@@ -5,9 +5,8 @@
 
 <template>
   <UTooltip text="Edit product">
-    <NuxtLink
+    <AppIconButton
       :to="`/admin/products/${product.id}/edit`"
-      class="catalog-action"
       :aria-label="`Edit ${product.name}`"
     >
       <UIcon
@@ -15,6 +14,6 @@
         mode="svg"
         aria-hidden="true"
       />
-    </NuxtLink>
+    </AppIconButton>
   </UTooltip>
 </template>

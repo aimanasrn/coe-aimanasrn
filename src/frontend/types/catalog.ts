@@ -9,6 +9,18 @@ export interface CategoryResponse {
   message?: string
 }
 export type CategoryDialogMode = 'add' | 'view' | 'edit' | 'delete'
+export type CategoryProductFilter = 'all' | 'with' | 'empty'
+export interface CategorySort {
+  column: 'name' | 'products_count'
+  direction: 'asc' | 'desc'
+}
+export interface CategoryPage {
+  data: Category[]
+  total: number
+  current_page: number
+  per_page: number
+  last_page: number
+}
 export interface Product {
   id: number
   name: string

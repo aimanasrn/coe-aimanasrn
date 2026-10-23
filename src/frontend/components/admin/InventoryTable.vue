@@ -67,11 +67,21 @@
 
 <template>
   <section
-    class="catalog-panel inventory-panel"
+    class="min-w-0 overflow-hidden border border-border rounded-xl bg-white flex flex-col min-h-0"
     aria-labelledby="inventory-title"
   >
-    <div class="catalog-panel__header">
-      <h2 id="inventory-title">{{ title }}</h2>
+    <div
+      class="
+        flex items-center justify-between gap-4 pt-6 px-6 pb-5 max-md:flex-wrap max-md:gap-2.5
+        max-md:pt-5 max-md:px-4.5 max-md:pb-4.5
+      "
+    >
+      <h2
+        class="m-0 text-heading text-xl font-semibold leading-[1.4] tracking-[-0.4px] max-md:text-lg"
+        id="inventory-title"
+      >
+        {{ title }}
+      </h2>
       <NuxtLink
         v-if="viewAll"
         :to="{
@@ -81,21 +91,32 @@
             stock: stock === 'all' ? undefined : stock
           }
         }"
-        class="catalog-link"
+        class="
+          inline-flex items-center gap-2 rounded-[3px] text-primary text-sm font-medium leading-normal
+          cursor-pointer hover:text-primary-hover hover:underline hover:underline-offset-4
+        "
       >
         View all products
         <UIcon
+          class="w-4.5 h-4.5 flex-none"
           name="i-lucide-arrow-right"
           aria-hidden="true"
         />
       </NuxtLink>
     </div>
     <div
-      class="inventory-tabs"
+      class="
+        flex overflow-x-auto gap-7 my-0 mx-6 border-b border-border max-md:gap-5 max-md:mr-4.5
+        max-md:ml-4.5 max-[361px]:gap-3
+      "
       role="group"
       aria-label="Filter products by stock"
     >
       <button
+        class="
+          relative pb-[15px] text-sm leading-[22px] font-medium whitespace-nowrap cursor-pointer
+          max-md:text-[14px]
+        "
         v-for="tab in tabs"
         :key="tab.value"
         type="button"
@@ -110,13 +131,24 @@
         {{ tab.label }}
       </button>
     </div>
-    <label class="inventory-search">
+    <label
+      class="
+        flex items-center gap-2.5 h-12 mt-4.5 mx-6 mb-5.5 py-0 px-3 border border-[#dce3df]
+        rounded-lg bg-white text-[#929c96] focus-within:border-primary focus-within:ring-[3px]
+        focus-within:ring-primary/10 max-md:mr-4.5 max-md:ml-4.5
+      "
+    >
       <span class="sr-only">Search products</span>
       <UIcon
+        class="w-5 h-5 flex-none"
         name="i-lucide-search"
         aria-hidden="true"
       />
       <input
+        class="
+          w-full min-w-0 h-full bg-transparent text-heading text-sm outline-none
+          placeholder:text-[#929c96]
+        "
         type="search"
         placeholder="Search products..."
         maxlength="150"
@@ -133,15 +165,24 @@
     <template v-else>
       <div
         v-if="products.length"
-        class="catalog-table-region"
+        class="relative min-w-0 my-0 mx-6 overflow-x-auto max-md:mr-4.5 max-md:ml-4.5"
         role="region"
         aria-label="Products table"
         tabindex="0"
       >
-        <table class="catalog-table">
+        <table
+          class="
+            w-full min-w-197.5 border-collapse text-left text-body text-sm leading-normal
+            [&_th:first-child]:pl-0 [&_td:first-child]:pl-0 [&_th:last-child]:pr-0
+            [&_td:last-child]:pr-0 [&_tbody_tr:last-child_td]:border-b-0
+          "
+        >
           <thead>
             <tr>
               <th
+                class="
+                  py-3 px-2.5 border-b border-border text-muted text-[14px] font-medium whitespace-nowrap
+                "
                 v-for="column in columns"
                 :key="column.key"
                 scope="col"
@@ -158,7 +199,10 @@
                 <button
                   v-if="!viewAll && column.sort"
                   type="button"
-                  class="inline-flex items-center gap-1.5 rounded cursor-pointer hover:text-primary focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-4 [&_.iconify]:size-3.5"
+                  class="
+                    inline-flex items-center gap-1.5 rounded cursor-pointer hover:text-primary
+                    focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-4
+                  "
                   :class="{ 'text-primary': sort.column === column.sort }"
                   :disabled="loading"
                   :aria-label="`Sort by ${column.label} ${nextSortDirection(column.sort) === 'asc' ? 'ascending' : 'descending'}`"
@@ -166,6 +210,7 @@
                 >
                   {{ column.label }}
                   <UIcon
+                    class="size-3.5"
                     :name="
                       sort.column === column.sort
                         ? sort.direction === 'asc'
@@ -182,56 +227,77 @@
           </thead>
           <tbody>
             <tr
+              class="hover:bg-[#fafcfb]"
               v-for="product in products"
               :key="product.id"
             >
-              <td>
-                <div class="inventory-product">
-                  <span class="inventory-product__image">
+              <td class="py-3.5 px-2.5 border-b border-[#edf0ee] align-middle">
+                <div class="flex min-w-52.5 items-center gap-3">
+                  <span
+                    class="
+                      grid w-14 h-14.5 flex-none place-items-center overflow-hidden rounded-lg bg-[#f1f5f3]
+                      text-[#547060]
+                    "
+                  >
                     <img
+                      class="w-full h-full object-cover"
                       v-if="product.image_urls?.length"
                       :src="product.image_urls[0]"
                       alt=""
                       loading="lazy"
                     />
                     <UIcon
+                      class="w-[25px] h-[25px]"
                       v-else
                       name="i-lucide-book-open"
                       aria-hidden="true"
                     />
                   </span>
                   <div>
-                    <NuxtLink :to="'/products/' + product.id">
+                    <NuxtLink
+                      class="
+                        block max-w-60 text-heading text-sm font-medium leading-normal wrap-anywhere
+                        hover:text-primary hover:underline hover:underline-offset-3
+                      "
+                      :to="'/products/' + product.id"
+                    >
                       {{ product.name }}
                     </NuxtLink>
-                    <span class="inventory-product__sku">{{ product.sku }}</span>
+                    <span class="block mt-[5px] text-muted text-xs leading-normal wrap-anywhere">{{
+                      product.sku
+                    }}</span>
                   </div>
                 </div>
               </td>
-              <td>{{ product.category?.name || 'Uncategorized' }}</td>
-              <td class="whitespace-nowrap">{{ formatMoney(product.price) }}</td>
-              <td class="whitespace-nowrap">{{ product.stock_quantity }} units</td>
-              <td>
+              <td class="py-3.5 px-2.5 border-b border-[#edf0ee] align-middle">
+                {{ product.category?.name || 'Uncategorized' }}
+              </td>
+              <td class="whitespace-nowrap py-3.5 px-2.5 border-b border-[#edf0ee] align-middle">
+                {{ formatMoney(product.price) }}
+              </td>
+              <td class="whitespace-nowrap py-3.5 px-2.5 border-b border-[#edf0ee] align-middle">
+                {{ product.stock_quantity }} units
+              </td>
+              <td class="py-3.5 px-2.5 border-b border-[#edf0ee] align-middle">
                 <StockBadge
                   :quantity="product.stock_quantity"
                   :threshold="threshold"
                 />
               </td>
-              <td>
+              <td class="py-3.5 px-2.5 border-b border-[#edf0ee] align-middle">
                 <div class="flex items-center gap-1.5 whitespace-nowrap">
                   <EditProductAction :product="product" />
                   <UTooltip text="View product">
-                    <NuxtLink
+                    <AppIconButton
                       :to="'/products/' + product.id"
                       :aria-label="'View product: ' + product.name"
-                      class="catalog-action"
                     >
                       <UIcon
                         name="i-lucide-eye"
                         mode="svg"
                         aria-hidden="true"
                       />
-                    </NuxtLink>
+                    </AppIconButton>
                   </UTooltip>
                   <DeleteProductModal
                     :product="product"
@@ -245,21 +311,24 @@
       </div>
       <div
         v-else
-        class="flex min-h-[225px] flex-col items-center justify-center gap-3 px-7 py-[50px] text-center text-[#7b867f] [&_h3]:text-[17px] [&_h3]:font-semibold [&_h3]:text-[#374f40] [&_p]:max-w-[320px] [&_p]:text-sm"
+        class="
+          flex min-h-[225px] flex-col items-center justify-center gap-3 px-7 py-[50px] text-center
+          text-[#7b867f]
+        "
       >
         <UIcon
           name="i-lucide-package-search"
           size="32"
           aria-hidden="true"
         />
-        <h3>
+        <h3 class="text-[17px] font-semibold text-[#374f40]">
           {{
             total === 0 && !search && stock === 'all'
               ? 'Your catalog is ready to grow'
               : 'No products found'
           }}
         </h3>
-        <p>
+        <p class="max-w-[320px] text-sm">
           {{
             search
               ? 'Try a different name or SKU.'
@@ -270,18 +339,27 @@
         </p>
         <button
           v-if="search || stock !== 'all'"
-          class="catalog-link"
+          class="
+            inline-flex items-center gap-2 rounded-[3px] text-primary text-sm font-medium leading-normal
+            cursor-pointer hover:text-primary-hover hover:underline hover:underline-offset-4
+          "
           @click="clearFilters"
         >
           Clear filters
           <UIcon
+            class="w-4.5 h-4.5 flex-none"
             name="i-lucide-arrow-right"
             aria-hidden="true"
           />
         </button>
       </div>
     </template>
-    <footer class="inventory-footer">
+    <footer
+      class="
+        flex flex-wrap items-center justify-between gap-3.5 mt-auto py-5.5 px-6 border-t
+        border-[#edf0ee] text-muted text-[14px] leading-normal max-md:p-4.5
+      "
+    >
       <span aria-live="polite"> Showing {{ products.length }} of {{ total }} products </span>
       <div
         v-if="!viewAll"

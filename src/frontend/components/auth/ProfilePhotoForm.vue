@@ -6,6 +6,7 @@
   const input = ref<HTMLInputElement | null>(null)
   const inputId = useId()
   const selected = shallowRef<File | null>(null)
+  const selectionError = ref('')
   const preview = ref('')
   const saving = ref(false)
   const initials = computed(() =>
@@ -19,6 +20,7 @@
   )
 
   function clearSelection() {
+    selectionError.value = ''
     if (preview.value) URL.revokeObjectURL(preview.value)
     preview.value = ''
     selected.value = null
@@ -31,11 +33,11 @@
     if (!file || props.disabled || saving.value) return
     clearSelection()
     if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-      notification.warning('Photo could not be added', 'Please choose a JPG, PNG or WebP image.')
+      selectionError.value = 'Please choose a JPG, PNG or WebP image.'
       return
     }
     if (file.size > 2 * 1024 * 1024) {
-      notification.warning('Photo is too large', 'Your photo must be 2 MB or smaller.')
+      selectionError.value = 'Your photo must be 2 MB or smaller.'
       return
     }
     selected.value = file
@@ -115,14 +117,16 @@
             type="file"
             accept="image/jpeg,image/png,image/webp"
             aria-label="Choose profile photo"
+            :aria-invalid="selectionError ? true : undefined"
+            :aria-describedby="selectionError ? inputId + '-error' : undefined"
             class="sr-only"
             :disabled="disabled || saving"
             @change="choosePhoto"
           />
           <div class="flex flex-wrap gap-3">
-            <button
+            <AppButton
               type="button"
-              class="catalog-button catalog-button--secondary"
+              variant="secondary"
               :disabled="disabled || saving"
               @click="input?.click()"
             >
@@ -131,19 +135,28 @@
                 aria-hidden="true"
               />
               {{ user?.avatar_url ? 'Change photo' : 'Choose photo' }}
-            </button>
-            <button
+            </AppButton>
+            <AppButton
               v-if="user?.avatar_url && !selected"
               type="button"
-              class="catalog-button catalog-button--secondary text-danger"
+              variant="secondary"
+              class="text-danger"
               :disabled="disabled || saving"
               @click="savePhoto(true)"
             >
               Remove photo
-            </button>
+            </AppButton>
           </div>
           <p class="text-xs leading-5 text-muted">
             JPG, PNG or WebP. Max 2 MB, up to 4096 x 4096 pixels.
+          </p>
+          <p
+            v-if="selectionError"
+            :id="inputId + '-error'"
+            class="text-sm text-danger"
+            role="alert"
+          >
+            {{ selectionError }}
           </p>
         </div>
       </div>
@@ -155,19 +168,26 @@
         <div class="flex flex-wrap gap-3">
           <button
             type="submit"
-            class="account-button text-sm"
+            class="
+              inline-flex items-center justify-center gap-2.5 min-h-12 py-3 px-5.5 rounded-lg bg-primary
+              text-white font-semibold cursor-pointer
+              transition-[background,border-color,color,box-shadow,transform] duration-150
+              hover:bg-primary-hover active:translate-y-px disabled:opacity-60 disabled:cursor-wait
+              focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-primary
+              focus-visible:outline-offset-4 text-sm
+            "
             :disabled="disabled || saving"
           >
             {{ saving ? 'Saving photo...' : 'Save photo' }}
           </button>
-          <button
+          <AppButton
             type="button"
-            class="catalog-button catalog-button--secondary"
+            variant="secondary"
             :disabled="disabled || saving"
             @click="cancelSelection"
           >
             Cancel
-          </button>
+          </AppButton>
         </div>
       </div>
     </form>

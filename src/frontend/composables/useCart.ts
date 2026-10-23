@@ -4,16 +4,21 @@ export function useCart() {
   const accountId = user.value?.id
   const cart = useState<Cart | null>('shopping-cart-' + accountId, () => null)
   const busy = useState('cart-busy-' + accountId, () => false)
+  const loading = useState('cart-loading-' + accountId, () => false)
   const error = useState('cart-error-' + accountId, () => '')
   const requestFetch = useRequestFetch()
   const notification = useActionToast()
   async function refresh() {
+    loading.value = true
+    error.value = ''
     try {
       const response = await requestFetch<{ data: Cart }>('/api/cart')
       cart.value = response.data
       error.value = ''
     } catch {
       error.value = 'We could not load your cart. Please try again.'
+    } finally {
+      loading.value = false
     }
     return { loaded: true }
   }
@@ -58,6 +63,7 @@ export function useCart() {
   return {
     cart,
     busy,
+    loading,
     error,
     refresh,
     add: (productId: number, quantity: number) =>

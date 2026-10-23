@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { catalogDialogUi } from '~/utils/dialogUi'
   import type { Category, CategoryDialogMode } from '~/types/catalog'
   import CategoryForm from '~/components/admin/CategoryForm.vue'
 
@@ -33,12 +34,6 @@
   function close(value = false) {
     if (busy.value) return
     open.value = value
-    if (value || props.mode === 'view') return
-
-    notification.info(
-      props.mode === 'delete' ? 'Deletion cancelled' : 'Changes cancelled',
-      props.mode === 'delete' ? 'The category was not deleted.' : 'No category changes were saved.'
-    )
   }
 
   function saved(category: Category) {
@@ -88,11 +83,7 @@
     :description="descriptions[mode]"
     :dismissible="!busy"
     :close="!busy"
-    :ui="{
-      content: 'catalog-dialog',
-      overlay: 'bg-[#10251c]/35 backdrop-blur-[2px]',
-      title: 'catalog-dialog__title'
-    }"
+    :ui="catalogDialogUi"
     @update:open="close"
     @after:leave="emit('closed')"
   >
@@ -109,39 +100,40 @@
         v-else-if="category && mode === 'view'"
         class="flex flex-col gap-5"
       >
-        <dl
-          class="grid gap-5 [&_dt]:mb-[5px] [&_dt]:text-[13px] [&_dt]:text-[#7b867f] [&_dd]:m-0 [&_dd]:max-h-60 [&_dd]:overflow-y-auto [&_dd]:text-heading [&_dd]:whitespace-pre-wrap [&_dd]:wrap-anywhere"
-        >
+        <dl class="grid gap-5">
           <div>
-            <dt>Category name</dt>
-            <dd>{{ category.name }}</dd>
+            <dt class="mb-[5px] text-[13px] text-[#7b867f]">Category name</dt>
+            <dd class="m-0 max-h-60 overflow-y-auto text-heading whitespace-pre-wrap wrap-anywhere">
+              {{ category.name }}
+            </dd>
           </div>
           <div>
-            <dt>Description</dt>
-            <dd>
+            <dt class="mb-[5px] text-[13px] text-[#7b867f]">Description</dt>
+            <dd class="m-0 max-h-60 overflow-y-auto text-heading whitespace-pre-wrap wrap-anywhere">
               {{ category.description || 'No description has been added yet.' }}
             </dd>
           </div>
           <div>
-            <dt>Products</dt>
-            <dd>{{ (category.products_count ?? 0).toLocaleString() }}</dd>
+            <dt class="mb-[5px] text-[13px] text-[#7b867f]">Products</dt>
+            <dd class="m-0 max-h-60 overflow-y-auto text-heading whitespace-pre-wrap wrap-anywhere">
+              {{ (category.products_count ?? 0).toLocaleString() }}
+            </dd>
           </div>
         </dl>
         <div class="flex justify-end gap-3 pt-[5px]">
-          <button
+          <AppButton
             type="button"
-            class="catalog-button catalog-button--secondary"
+            variant="secondary"
             @click="close()"
           >
             Close
-          </button>
-          <button
+          </AppButton>
+          <AppButton
             type="button"
-            class="catalog-button catalog-button--primary"
             @click="emit('edit', category)"
           >
             Edit category
-          </button>
+          </AppButton>
         </div>
       </div>
       <div
@@ -155,7 +147,10 @@
         </p>
         <p
           v-if="hasProducts"
-          class="mb-5 rounded-[7px] border px-[18px] py-3.5 text-sm border-[#fde68a] bg-[#fffbeb] text-[#92400e]"
+          class="
+            mb-5 rounded-[7px] border px-[18px] py-3.5 text-sm border-[#fde68a] bg-[#fffbeb]
+            text-[#92400e]
+          "
           role="status"
         >
           This category contains {{ category.products_count }}
@@ -163,22 +158,22 @@
           category before deleting it.
         </p>
         <div class="flex justify-end gap-3 pt-[5px]">
-          <button
+          <AppButton
             type="button"
-            class="catalog-button catalog-button--secondary"
+            variant="secondary"
             :disabled="busy"
             @click="close()"
           >
             Cancel
-          </button>
-          <button
+          </AppButton>
+          <AppButton
             type="button"
-            class="catalog-button catalog-button--danger"
+            variant="danger"
             :disabled="busy || hasProducts"
             @click="deleteCategory"
           >
             {{ busy ? 'Deleting category...' : 'Delete category' }}
-          </button>
+          </AppButton>
         </div>
       </div>
     </template>

@@ -20,10 +20,10 @@
 </script>
 
 <template>
-  <div class="workspace-navigation">
+  <div class="flex h-full min-h-120 flex-col pt-7.5 px-4 pb-5">
     <NuxtLink
       to="/admin"
-      class="workspace-navigation__brand"
+      class="self-start mt-1 mx-2 mb-0 rounded-md"
       @click="emit('navigate')"
     >
       <StudyMartLogo
@@ -34,27 +34,31 @@
 
     <nav
       aria-label="Admin navigation"
-      class="workspace-nav"
+      class="flex flex-col gap-[9px] mt-9"
     >
       <NuxtLink
         v-for="link in links"
         :key="link.to"
         :to="link.to"
         :aria-current="isActive(link.to) ? 'page' : undefined"
-        class="workspace-nav__link"
-        :class="isActive(link.to) ? 'workspace-nav__link--active' : ''"
+        class="
+          flex items-center gap-3 min-h-12 py-3 px-3.5 rounded-lg text-[#d5e3dc] text-base font-medium
+          leading-normal transition-[background,border-color,color,box-shadow,transform] duration-150
+          hover:text-white hover:bg-[#1a4939] aria-[current=page]:bg-[#245642]
+          aria-[current=page]:text-white
+        "
         @click="emit('navigate')"
       >
         <UIcon
           :name="link.icon"
           size="18"
-          class="shrink-0"
+          class="w-[21px] h-[21px] flex-none"
           aria-hidden="true"
         />
         {{ link.label }}
       </NuxtLink>
     </nav>
-    <div class="workspace-navigation__account">
+    <div class="mt-auto pt-9">
       <SidebarAccount @navigate="emit('navigate')" />
     </div>
   </div>

@@ -4,12 +4,7 @@ export default defineNuxtConfig({
   devtools: { enabled: false },
 
   modules: ['@nuxt/ui'],
-  css: [
-    '~/assets/css/main.css',
-    '~/assets/css/account.css',
-    '~/assets/css/workspace.css',
-    '~/assets/css/shop.css'
-  ],
+  css: ['~/assets/css/main.css'],
 
   app: {
     head: {

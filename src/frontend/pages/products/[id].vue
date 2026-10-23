@@ -80,10 +80,22 @@
       @retry="refresh()"
     />
     <template v-else>
-      <header class="page-header">
+      <header
+        class="
+          flex items-start justify-between gap-5 mb-7 [&_>_:is(button,_a)]:flex-none max-md:flex-wrap
+          max-md:gap-4.5 max-md:mb-6
+        "
+      >
         <div>
-          <h1>{{ product.name }}</h1>
-          <p>
+          <h1
+            class="
+              m-0 text-heading text-[34px] font-semibold leading-[1.2] tracking-[-0.9px] wrap-anywhere
+              max-md:text-[30px]
+            "
+          >
+            {{ product.name }}
+          </h1>
+          <p class="mt-[9px] text-muted text-base leading-[1.6] max-md:text-sm">
             {{ product.sku }}
             <span aria-hidden="true">·</span>
             {{ product.category?.name ?? 'Uncategorised' }}
@@ -94,17 +106,14 @@
             :product="product"
             @deleted="navigateTo('/admin/products')"
           />
-          <NuxtLink
-            :to="editTo"
-            class="catalog-button catalog-button--primary"
-          >
+          <AppButton :to="editTo">
             <UIcon
               name="i-lucide-pencil"
               mode="svg"
               aria-hidden="true"
             />
             Edit product
-          </NuxtLink>
+          </AppButton>
         </div>
       </header>
       <div class="grid grid-cols-2 items-start gap-6 max-[1101px]:grid-cols-1">
@@ -113,8 +122,12 @@
           :name="product.name"
           :edit-to="editTo"
         />
-        <article class="product-details-panel">
-          <p class="product-price">{{ formatMoney(product.price) }}</p>
+        <article
+          class="min-w-0 p-6.5 border border-border rounded-xl bg-white max-md:py-5 max-md:px-4.5"
+        >
+          <p class="text-heading text-[36px] font-semibold leading-[1.2] tracking-[-0.8px]">
+            {{ formatMoney(product.price) }}
+          </p>
           <div
             class="mt-[18px] flex flex-wrap items-center gap-3.5 text-sm leading-[1.5] text-[#6b7871]"
           >
@@ -128,26 +141,40 @@
             </span>
           </div>
           <section
-            class="mt-[26px] border-t border-[#e5eae7] pt-[26px] [&_h2]:mt-0 [&_h2]:mb-5 [&_h2]:text-lg [&_h2]:leading-[1.4] [&_h2]:font-[650] [&_h2]:text-heading [&_dl]:flex [&_dl]:flex-col [&_dl]:gap-[15px] [&_dl]:text-sm [&_dl]:leading-[1.5] [&_dl>div]:grid [&_dl>div]:grid-cols-[minmax(110px,1fr)_minmax(0,1.2fr)] [&_dl>div]:gap-4 [&_dl>div]:max-md:grid-cols-[minmax(100px,1fr)_minmax(0,1.2fr)] [&_dt]:text-[#7b867f] [&_dd]:text-[#37463f] [&_dd]:wrap-anywhere"
+            class="mt-[26px] border-t border-[#e5eae7] pt-[26px]"
             aria-labelledby="product-details-heading"
           >
-            <h2 id="product-details-heading">Product details</h2>
-            <dl>
+            <h2
+              class="mt-0 mb-5 text-lg leading-[1.4] font-[650] text-heading"
+              id="product-details-heading"
+            >
+              Product details
+            </h2>
+            <dl class="flex flex-col gap-[15px] text-sm leading-[1.5]">
               <div
+                class="
+                  grid grid-cols-[minmax(110px,1fr)_minmax(0,1.2fr)] gap-4
+                  max-md:grid-cols-[minmax(100px,1fr)_minmax(0,1.2fr)]
+                "
                 v-for="detail in details"
                 :key="detail.label"
               >
-                <dt>{{ detail.label }}</dt>
-                <dd>{{ detail.value }}</dd>
+                <dt class="text-[#7b867f]">{{ detail.label }}</dt>
+                <dd class="text-[#37463f] wrap-anywhere">{{ detail.value }}</dd>
               </div>
             </dl>
           </section>
           <section
-            class="mt-[26px] border-t border-[#e5eae7] pt-[26px] [&_h2]:mt-0 [&_h2]:mb-5 [&_h2]:text-lg [&_h2]:leading-[1.4] [&_h2]:font-[650] [&_h2]:text-heading [&_p]:text-[15px] [&_p]:leading-[1.8] [&_p]:text-[#66746c] [&_p]:whitespace-pre-wrap [&_p]:wrap-anywhere"
+            class="mt-[26px] border-t border-[#e5eae7] pt-[26px]"
             aria-labelledby="product-description-heading"
           >
-            <h2 id="product-description-heading">Description</h2>
-            <p>
+            <h2
+              class="mt-0 mb-5 text-lg leading-[1.4] font-[650] text-heading"
+              id="product-description-heading"
+            >
+              Description
+            </h2>
+            <p class="text-[15px] leading-[1.8] text-[#66746c] whitespace-pre-wrap wrap-anywhere">
               {{ product.description || 'No description has been added yet.' }}
             </p>
           </section>

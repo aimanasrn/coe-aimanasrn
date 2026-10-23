@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { catalogFormUi } from '~/utils/formUi'
   import type { FormError, FormErrorEvent } from '@nuxt/ui'
   import type { Category, CategoryResponse } from '~/types/catalog'
 
@@ -35,10 +36,6 @@
   }
 
   function invalid(event: FormErrorEvent) {
-    notification.warning(
-      'Please check the form',
-      'Complete the category name and correct the highlighted errors.'
-    )
     const id = event.errors[0]?.id
     if (id) document.getElementById(id)?.focus()
   }
@@ -102,9 +99,10 @@
       name="name"
       label="Category name"
       required
-      class="catalog-field"
+      :ui="catalogFormUi.field"
     >
       <UInput
+        :ui="catalogFormUi.input"
         id="category-name"
         v-model="form.name"
         required
@@ -115,13 +113,14 @@
     </UFormField>
     <UFormField
       name="description"
-      class="catalog-field"
+      :ui="catalogFormUi.field"
     >
       <template #label>
         Description
         <span>(optional)</span>
       </template>
       <UTextarea
+        :ui="catalogFormUi.textarea"
         id="category-description"
         v-model="form.description"
         :rows="4"
@@ -130,21 +129,20 @@
       />
     </UFormField>
     <div class="flex justify-end gap-3 pt-[5px]">
-      <button
+      <AppButton
         type="button"
-        class="catalog-button catalog-button--secondary"
+        variant="secondary"
         :disabled="saving"
         @click="emit('cancel')"
       >
         Cancel
-      </button>
-      <button
+      </AppButton>
+      <AppButton
         type="submit"
-        class="catalog-button catalog-button--primary"
         :disabled="saving"
       >
         {{ saving ? 'Saving category...' : category ? 'Save changes' : 'Save category' }}
-      </button>
+      </AppButton>
     </div>
   </UForm>
 </template>

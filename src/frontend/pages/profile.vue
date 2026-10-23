@@ -83,7 +83,7 @@
 </script>
 
 <template>
-  <div class="account-profile">
+  <div>
     <section>
       <div class="mb-8 flex flex-wrap items-start justify-between gap-4">
         <div>
@@ -93,7 +93,10 @@
           </p>
         </div>
         <span
-          class="mt-2 inline-flex items-center gap-1.5 rounded-full border border-[#cfe7d5] bg-[#edf8f0] px-3 py-1 text-xs font-medium text-primary"
+          class="
+            mt-2 inline-flex items-center gap-1.5 rounded-full border border-[#cfe7d5] bg-[#edf8f0] px-3
+            py-1 text-xs font-medium text-primary
+          "
           ><UIcon
             :name="isAdmin ? 'i-lucide-shield-check' : 'i-lucide-user-round'"
             class="size-3.5"
@@ -117,7 +120,10 @@
 
       <section
         aria-labelledby="details-title"
-        class="grid gap-6 rounded-2xl border border-border bg-surface p-6 sm:p-6 md:grid-cols-[1fr_1.3fr] md:gap-10"
+        class="
+          grid gap-6 rounded-2xl border border-border bg-surface p-6 sm:p-6 md:grid-cols-[1fr_1.3fr]
+          md:gap-10
+        "
       >
         <div>
           <h2
@@ -170,7 +176,14 @@
           <button
             type="submit"
             :disabled="!!saving || !ready"
-            class="account-button text-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+            class="
+              inline-flex items-center justify-center gap-2.5 min-h-12 py-3 px-5.5 rounded-lg bg-primary
+              text-white font-semibold cursor-pointer
+              transition-[background,border-color,color,box-shadow,transform] duration-150
+              hover:bg-primary-hover active:translate-y-px disabled:opacity-60 disabled:cursor-wait
+              focus-visible:outline-solid text-sm focus-visible:outline-2 focus-visible:outline-offset-4
+              focus-visible:outline-primary
+            "
           >
             {{ saving === 'details' ? 'Saving…' : 'Save changes' }}
           </button>
@@ -179,7 +192,10 @@
 
       <section
         aria-labelledby="password-title"
-        class="mt-6 grid gap-6 rounded-2xl border border-border bg-surface p-6 sm:p-6 md:grid-cols-[1fr_1.3fr] md:gap-10"
+        class="
+          mt-6 grid gap-6 rounded-2xl border border-border bg-surface p-6 sm:p-6
+          md:grid-cols-[1fr_1.3fr] md:gap-10
+        "
       >
         <div>
           <h2
@@ -232,7 +248,14 @@
           <button
             type="submit"
             :disabled="!!saving || !ready"
-            class="account-button text-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+            class="
+              inline-flex items-center justify-center gap-2.5 min-h-12 py-3 px-5.5 rounded-lg bg-primary
+              text-white font-semibold cursor-pointer
+              transition-[background,border-color,color,box-shadow,transform] duration-150
+              hover:bg-primary-hover active:translate-y-px disabled:opacity-60 disabled:cursor-wait
+              focus-visible:outline-solid text-sm focus-visible:outline-2 focus-visible:outline-offset-4
+              focus-visible:outline-primary
+            "
           >
             {{ saving === 'password' ? 'Updating…' : 'Update password' }}
           </button>

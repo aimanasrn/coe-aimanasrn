@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { catalogDialogUi } from '~/utils/dialogUi'
   import type { Product } from '~/types/catalog'
 
   const props = defineProps<{
@@ -13,7 +14,7 @@
   const notification = useActionToast()
   const open = ref(false)
   const busy = ref(false)
-  const trigger = ref<HTMLButtonElement>()
+  const trigger = useTemplateRef('trigger')
 
   function confirmDelete() {
     open.value = true
@@ -46,10 +47,10 @@
 
 <template>
   <UTooltip text="Delete product">
-    <button
+    <AppIconButton
       ref="trigger"
       type="button"
-      class="catalog-action catalog-action--danger"
+      variant="danger"
       :aria-label="`Delete ${product.name}`"
       aria-haspopup="dialog"
       :aria-expanded="open"
@@ -60,7 +61,7 @@
         mode="svg"
         aria-hidden="true"
       />
-    </button>
+    </AppIconButton>
   </UTooltip>
   <UModal
     v-model:open="open"
@@ -68,11 +69,7 @@
     description="Remove this product from your StudyMart catalog."
     :dismissible="!busy"
     :close="!busy"
-    :ui="{
-      content: 'catalog-dialog',
-      overlay: 'bg-[#10251c]/35 backdrop-blur-[2px]',
-      title: 'catalog-dialog__title'
-    }"
+    :ui="catalogDialogUi"
     @after:leave="trigger?.focus()"
   >
     <template #body>
@@ -83,22 +80,22 @@
           ? This action cannot be undone.
         </p>
         <div class="flex justify-end gap-3 pt-[5px]">
-          <button
+          <AppButton
             type="button"
-            class="catalog-button catalog-button--secondary"
+            variant="secondary"
             :disabled="busy"
             @click="open = false"
           >
             Cancel
-          </button>
-          <button
+          </AppButton>
+          <AppButton
             type="button"
-            class="catalog-button catalog-button--danger"
+            variant="danger"
             :disabled="busy"
             @click="deleteProduct"
           >
             {{ busy ? 'Deleting product...' : 'Delete product' }}
-          </button>
+          </AppButton>
         </div>
       </div>
     </template>

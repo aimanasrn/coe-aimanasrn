@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\CatalogCache;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,11 +13,49 @@ use Illuminate\Validation\Rule;
 
 class CategoryController extends Controller
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        return response()->json(CatalogCache::remember('admin-categories', [], fn (): array => [
-            'data' => Category::query()->withCount('products')->orderBy('name')->get()->toArray(),
-        ]));
+        if (! $request->hasAny(['q', 'products', 'page', 'per_page', 'sort_by', 'sort_direction'])) {
+            return response()->json(CatalogCache::remember('admin-categories', [], fn (): array => [
+                'data' => Category::query()->withCount('products')->orderBy('name')->get()->toArray(),
+            ]));
+        }
+
+        $filters = $request->validate([
+            'q' => ['nullable', 'string', 'max:150'],
+            'products' => ['nullable', Rule::in(['all', 'with', 'empty'])],
+            'page' => ['sometimes', 'integer', 'min:1', 'max:10000'],
+            'per_page' => ['sometimes', 'integer', Rule::in([5, 10, 15, 20, 25, 50])],
+            'sort_by' => ['sometimes', Rule::in(['name', 'products_count'])],
+            'sort_direction' => ['sometimes', Rule::in(['asc', 'desc'])],
+        ]);
+
+        return response()->json(CatalogCache::remember('admin-category-pages', array_merge($filters, [
+            'page' => $request->integer('page', 1),
+            'url' => $request->url(),
+        ]), function () use ($filters): array {
+            $categories = Category::query()->select(['id', 'name', 'description'])->withCount('products');
+            $search = trim($filters['q'] ?? '');
+
+            if ($search !== '') {
+                $categories->where(function (Builder $query) use ($search): void {
+                    $query->whereLike('name', '%'.$search.'%')
+                        ->orWhereLike('description', '%'.$search.'%');
+                });
+            }
+
+            if (($filters['products'] ?? 'all') === 'with') {
+                $categories->whereHas('products');
+            } elseif (($filters['products'] ?? 'all') === 'empty') {
+                $categories->whereDoesntHave('products');
+            }
+
+            return $categories
+                ->orderBy($filters['sort_by'] ?? 'name', $filters['sort_direction'] ?? 'asc')
+                ->orderBy('id')
+                ->paginate((int) ($filters['per_page'] ?? 5))
+                ->toArray();
+        }));
     }
 
     public function store(Request $request): JsonResponse

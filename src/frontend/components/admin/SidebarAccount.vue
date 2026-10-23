@@ -56,7 +56,7 @@
 <template>
   <div
     v-if="user"
-    class="workspace-account"
+    class="pt-5 px-1 pb-0 border-t border-[#385b4c]"
   >
     <UDropdownMenu
       v-model:open="menuOpen"
@@ -64,9 +64,14 @@
       :disabled="loggingOut"
       :content="{ side: 'top', align: 'start', sideOffset: 8, collisionPadding: 12 }"
       :ui="{
-        content: 'workspace-account-menu',
-        item: 'workspace-account-menu__item',
-        itemLeadingIcon: 'workspace-account-menu__icon',
+        content:
+          'z-60 w-[var(--reka-dropdown-menu-trigger-width)] min-w-55 max-w-[calc(100vw_-_24px)] p-1.5 border border-border rounded-xl bg-white text-body shadow-[0_8px_28px_rgb(16_37_28_/_15%)]',
+        item: [
+          'flex items-center gap-2.5 min-h-11 py-2.5 px-3 rounded-[7px] text-body text-sm',
+          'leading-normal cursor-pointer data-[highlighted]:bg-secondary',
+          'data-[highlighted]:text-primary hover:bg-secondary hover:text-primary'
+        ].join(' '),
+        itemLeadingIcon: 'w-4.5 h-4.5 flex-none text-inherit',
         separator: 'my-1 bg-border'
       }"
     >
@@ -74,27 +79,38 @@
         type="button"
         aria-label="Account menu"
         :aria-busy="loggingOut"
-        class="workspace-account__profile"
+        class="
+          flex w-full min-w-0 items-center gap-2.5 py-2 px-1.5 rounded-lg text-left cursor-pointer
+          transition-[background,border-color,color,box-shadow,transform] duration-150
+          hover:bg-[#245642] aria-expanded:bg-[#245642]
+        "
       >
         <UAvatar
           :src="user.avatar_url || undefined"
           :alt="user.name"
           :text="initials"
           size="xl"
-          class="workspace-account__avatar"
+          class="
+            grid w-10 h-10 flex-none place-items-center rounded-full bg-[#2c654e] text-white text-sm
+            font-semibold
+          "
           :ui="{ fallback: 'text-white font-semibold' }"
         />
-        <span class="workspace-account__details">
-          <span class="workspace-account__name">{{ user.name }} <span>Admin</span></span>
+        <span class="flex-1 min-w-0">
           <span
-            class="workspace-account__email"
+            class="block overflow-hidden text-[#f5faf7] text-sm font-medium text-ellipsis whitespace-nowrap"
+            >{{ user.name }}
+            <span class="ml-[5px] text-[#bdcfc5] text-[12px] font-normal">Admin</span></span
+          >
+          <span
+            class="block overflow-hidden mt-[5px] text-[#b9cdc1] text-[12px] text-ellipsis whitespace-nowrap"
             :title="user.email"
             >{{ user.email }}</span
           >
         </span>
         <UIcon
           :name="loggingOut ? 'i-lucide-loader-circle' : 'i-lucide-chevrons-up-down'"
-          class="workspace-account__chevron"
+          class="w-4 h-4 flex-none text-[#b9cdc1]"
           :class="{ 'animate-spin motion-reduce:animate-none': loggingOut }"
           aria-hidden="true"
         />

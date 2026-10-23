@@ -50,11 +50,12 @@
     <form
       method="post"
       action="/api/auth/login"
-      class="auth-form"
+      class="grid gap-5.5"
       :aria-busy="submitting"
       @submit.prevent="submit"
     >
       <AuthField
+        variant="auth"
         id="email"
         v-model="email"
         label="Email address"
@@ -66,6 +67,7 @@
         :disabled="submitting || !ready"
       />
       <AuthField
+        variant="auth"
         id="password"
         v-model="password"
         label="Password"
@@ -79,24 +81,40 @@
       <button
         type="submit"
         :disabled="submitting || !ready"
-        class="account-button auth-submit"
+        class="
+          inline-flex items-center justify-center gap-2.5 py-3 px-5.5 rounded-lg bg-primary text-white
+          font-semibold cursor-pointer transition-[background,border-color,color,box-shadow,transform]
+          duration-150 hover:bg-primary-hover active:translate-y-px disabled:opacity-60
+          disabled:cursor-wait focus-visible:outline-2 focus-visible:outline-solid
+          focus-visible:outline-primary focus-visible:outline-offset-4 w-full min-h-12.5 mt-1
+          text-base max-[761px]:min-h-12
+        "
       >
         <UIcon
           v-if="submitting"
           name="i-lucide-loader-circle"
-          class="animate-spin motion-reduce:animate-none"
+          class="animate-spin motion-reduce:animate-none w-5 h-5"
           aria-hidden="true"
         />
         {{ submitting ? 'Logging in...' : 'Log in' }}
         <UIcon
+          class="w-5 h-5"
           v-if="!submitting"
           name="i-lucide-arrow-right"
           aria-hidden="true"
         />
       </button>
     </form>
-    <p class="auth-switch">
-      New to StudyMart? <NuxtLink to="/register">Create an account</NuxtLink>
+    <p class="mt-6.5 text-muted text-sm leading-[1.6] max-[761px]:text-sm">
+      New to StudyMart?
+      <NuxtLink
+        class="
+          ml-[5px] text-primary font-semibold underline underline-offset-3 hover:text-brand-deep
+          max-[361px]:ml-0.5
+        "
+        to="/register"
+        >Create an account</NuxtLink
+      >
     </p>
   </AuthScene>
 </template>

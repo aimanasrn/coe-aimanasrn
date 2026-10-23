@@ -1,4 +1,5 @@
 <script setup lang="ts">
+  import { catalogFormUi } from '~/utils/formUi'
   import type { FormError, FormErrorEvent } from '@nuxt/ui'
   import type { Product, ProductImageEntry, ProductResponse } from '~/types/catalog'
   import ProductImageUpload from '~/components/products/ProductImageUpload.vue'
@@ -116,10 +117,6 @@
   }
 
   function focusFirstError(event: FormErrorEvent) {
-    notification.warning(
-      'Please check the form',
-      'Complete the required fields and correct the highlighted errors.'
-    )
     const id = event.errors[0]?.id
     if (id) document.getElementById(id)?.focus()
   }
@@ -206,7 +203,11 @@
   >
     Could not load categories.
     <button
-      class="catalog-link"
+      class="
+        inline-flex items-center gap-2 rounded-[3px] text-primary text-sm font-medium leading-normal
+        cursor-pointer [&_.iconify]:w-4.5 [&_.iconify]:h-4.5 [&_.iconify]:flex-none
+        hover:text-primary-hover hover:underline hover:underline-offset-4
+      "
       @click="refresh()"
     >
       Try again
@@ -230,12 +231,28 @@
     @submit="submit"
     @error="focusFirstError"
   >
-    <div class="product-form-grid">
+    <div
+      class="
+        grid grid-cols-[minmax(0,_0.8fr)_minmax(0,_1.4fr)] items-stretch gap-5.5
+        max-[1101px]:grid-cols-1
+      "
+    >
       <section
-        class="catalog-panel catalog-panel--padded"
+        class="
+          min-w-0 overflow-hidden border border-border rounded-xl bg-white p-6.5 max-md:py-5
+          max-md:px-4.5
+        "
         aria-labelledby="product-images-heading"
       >
-        <h2 id="product-images-heading">Product images</h2>
+        <h2
+          class="
+            m-0 text-heading text-xl font-semibold leading-[1.4] tracking-[-0.4px] max-md:text-lg mb-5.5
+            max-md:mb-5
+          "
+          id="product-images-heading"
+        >
+          Product images
+        </h2>
         <UFormField
           name="images"
           :error="imageError || undefined"
@@ -248,17 +265,29 @@
         </UFormField>
       </section>
       <section
-        class="catalog-panel catalog-panel--padded product-information"
+        class="
+          min-w-0 overflow-hidden border border-border rounded-xl bg-white p-6.5 max-md:py-5
+          max-md:px-4.5 flex flex-col gap-5
+        "
         aria-labelledby="product-information-heading"
       >
-        <h2 id="product-information-heading">Product information</h2>
+        <h2
+          class="
+            m-0 text-heading text-xl font-semibold leading-[1.4] tracking-[-0.4px] max-md:text-lg
+            max-md:mb-5 mb-0
+          "
+          id="product-information-heading"
+        >
+          Product information
+        </h2>
         <UFormField
           name="name"
           label="Product name"
           required
-          class="catalog-field"
+          :ui="catalogFormUi.field"
         >
           <UInput
+            :ui="catalogFormUi.input"
             id="product-name"
             placeholder="Enter product name"
             v-model="form.name"
@@ -272,9 +301,10 @@
             name="sku"
             label="SKU"
             required
-            class="catalog-field"
+            :ui="catalogFormUi.field"
           >
             <UInput
+              :ui="catalogFormUi.input"
               id="product-sku"
               placeholder="Enter SKU"
               v-model="form.sku"
@@ -287,9 +317,10 @@
             name="category_id"
             label="Category"
             required
-            class="catalog-field"
+            :ui="catalogFormUi.field"
           >
             <USelect
+              :ui="catalogFormUi.select"
               id="product-category"
               v-model="form.category_id"
               :items="categoryItems"
@@ -303,10 +334,11 @@
             name="price"
             label="Price (RM)"
             required
-            class="catalog-field"
+            :ui="catalogFormUi.field"
           >
             <UInput
-              id="product-price"
+              :ui="catalogFormUi.input"
+              id="text-heading text-[36px] font-semibold leading-[1.2] tracking-[-0.8px]"
               placeholder="0.00"
               v-model="form.price"
               type="number"
@@ -321,9 +353,10 @@
             name="stock_quantity"
             label="Stock quantity"
             required
-            class="catalog-field"
+            :ui="catalogFormUi.field"
           >
             <UInput
+              :ui="catalogFormUi.input"
               id="product-stock"
               v-model="form.stock_quantity"
               type="number"
@@ -337,13 +370,14 @@
         </div>
         <UFormField
           name="description"
-          class="catalog-field"
+          :ui="catalogFormUi.field"
         >
           <template #label>
             Description
             <span>(optional)</span>
           </template>
           <UTextarea
+            :ui="catalogFormUi.textarea"
             id="product-description"
             placeholder="Enter product description..."
             v-model="form.description"
@@ -351,20 +385,26 @@
             class="w-full"
           />
         </UFormField>
-        <div
-          class="mt-1 border-t border-[#e5eae7] pt-6 [&>div]:grid-cols-[minmax(0,1.2fr)_minmax(0,1.2fr)_minmax(0,1fr)] [&>div]:gap-4 [&>div]:max-md:grid-cols-1 [&_h2_span]:ml-2 [&_h2_span]:text-[13px] [&_h2_span]:font-normal [&_h2_span]:text-[#89928c]"
-        >
-          <h2>
+        <div class="mt-1 border-t border-[#e5eae7] pt-6">
+          <h2
+            class="m-0 text-heading text-xl font-semibold leading-[1.4] tracking-[-0.4px] max-md:text-lg"
+          >
             Additional details
-            <span>Optional</span>
+            <span class="ml-2 text-[13px] font-normal text-[#89928c]">Optional</span>
           </h2>
-          <div class="grid grid-cols-2 gap-5 max-md:grid-cols-1 max-md:gap-[18px]">
+          <div
+            class="
+              grid max-md:gap-[18px] mt-4.5 grid-cols-[minmax(0,1.2fr)_minmax(0,1.2fr)_minmax(0,1fr)]
+              gap-4 max-md:grid-cols-1
+            "
+          >
             <UFormField
               name="brand"
               label="Brand / publisher"
-              class="catalog-field"
+              :ui="catalogFormUi.field"
             >
               <UInput
+                :ui="catalogFormUi.input"
                 id="product-brand"
                 placeholder="Enter brand or publisher"
                 v-model="form.brand"
@@ -375,9 +415,10 @@
             <UFormField
               name="barcode"
               label="Barcode / ISBN"
-              class="catalog-field"
+              :ui="catalogFormUi.field"
             >
               <UInput
+                :ui="catalogFormUi.input"
                 id="product-barcode"
                 placeholder="Enter barcode or ISBN"
                 v-model="form.barcode"
@@ -388,9 +429,10 @@
             <UFormField
               name="unit"
               label="Selling unit"
-              class="catalog-field"
+              :ui="catalogFormUi.field"
             >
               <USelect
+                :ui="catalogFormUi.select"
                 id="product-unit"
                 v-model="form.unit"
                 :items="unitItems"
@@ -403,21 +445,20 @@
       </section>
     </div>
     <div class="flex justify-end gap-3 pt-1">
-      <button
+      <AppButton
         type="button"
-        class="catalog-button catalog-button--secondary"
+        variant="secondary"
         :disabled="saving"
         @click="emit('cancel')"
       >
         Cancel
-      </button>
-      <button
+      </AppButton>
+      <AppButton
         type="submit"
-        class="catalog-button catalog-button--primary"
         :disabled="saving"
       >
         {{ saving ? 'Saving product...' : isEditing ? 'Save changes' : 'Save product' }}
-      </button>
+      </AppButton>
     </div>
   </UForm>
 </template>

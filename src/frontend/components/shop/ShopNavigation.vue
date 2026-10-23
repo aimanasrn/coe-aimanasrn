@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import StudyMartLogo from '~/components/StudyMartLogo.vue'
-import { useAuth } from "~/composables/useAuth"
-import { useCart } from "~/composables/useCart"
+  import { useAuth } from '~/composables/useAuth'
+  import { useCart } from '~/composables/useCart'
   const { user, logout } = useAuth()
   const { cart } = useCart()
   const cartCount = computed(() => cart.value?.item_count ?? 0)
@@ -35,19 +35,34 @@ import { useCart } from "~/composables/useCart"
   ])
 </script>
 <template>
-  <header class="shop-header">
-    <div class="shop-header__inner">
+  <header class="bg-white border-b border-border">
+    <div
+      class="
+        max-w-320 m-auto py-5.5 px-8 flex items-center gap-8 min-[1600px]:max-w-350 max-[761px]:py-4
+        max-[761px]:px-5 max-[761px]:gap-5 max-[761px]:flex-wrap max-[481px]:gap-y-2
+        max-[481px]:gap-x-4 max-[481px]:grid max-[481px]:grid-cols-[minmax(0,_1fr)_auto]
+      "
+    >
       <NuxtLink
         to="/shop"
         aria-label="StudyMart shop"
-        class="shop-brand"
+        class="
+          mr-auto rounded-lg max-[761px]:flex-1 max-[761px]:[&_img]:max-w-[175px]
+          max-[481px]:basis-[calc(100%_-_70px)] max-[481px]:order-0 max-[481px]:col-start-1
+          max-[481px]:row-start-1 max-[481px]:mr-0
+        "
         ><StudyMartLogo
       /></NuxtLink>
       <nav
         aria-label="Customer navigation"
-        class="shop-links"
+        class="
+          flex items-center gap-7.5 text-base font-semibold max-[761px]:gap-5 max-[481px]:order-2
+          max-[481px]:w-full max-[481px]:gap-7 max-[481px]:col-span-full max-[481px]:row-start-2
+          max-[481px]:mt-1
+        "
       >
         <NuxtLink
+          class="flex items-center gap-2 min-h-11 text-muted aria-[current=page]:text-primary"
           to="/shop"
           :aria-current="route.path.startsWith('/shop') ? 'page' : undefined"
           >Shop</NuxtLink
@@ -55,7 +70,10 @@ import { useCart } from "~/composables/useCart"
         <NuxtLink
           to="/cart"
           :aria-current="route.path === '/cart' ? 'page' : undefined"
-          class="shop-cart-link"
+          class="
+            justify-center min-w-11 flex items-center gap-2 min-h-11 text-muted
+            aria-[current=page]:text-primary
+          "
           :aria-label="'Cart, ' + cartCount + (cartCount === 1 ? ' item' : ' items')"
         >
           <UChip
@@ -79,7 +97,11 @@ import { useCart } from "~/composables/useCart"
         <button
           type="button"
           aria-label="Account menu"
-          class="shop-account"
+          class="
+            flex items-center gap-2 p-1 rounded-[30px] cursor-pointer max-[761px]:ml-auto
+            max-[481px]:order-1 max-[481px]:col-start-2 max-[481px]:row-start-1 max-[481px]:ml-0
+            max-[481px]:justify-self-end
+          "
           :disabled="loggingOut"
         >
           <UAvatar

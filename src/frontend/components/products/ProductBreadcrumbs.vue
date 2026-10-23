@@ -25,6 +25,10 @@
 <template>
   <UBreadcrumb
     :items="items"
-    class="text-xs mb-6 max-md:mb-5 [&_ol]:flex-wrap [&_ol]:gap-y-2 [&_li]:max-md:max-w-full [&_a]:max-md:whitespace-normal [&_a]:max-md:wrap-anywhere [&_span]:max-md:whitespace-normal [&_span]:max-md:wrap-anywhere"
+    class="
+      text-xs mb-6 max-md:mb-5 [&_ol]:flex-wrap [&_ol]:gap-y-2 [&_li]:max-md:max-w-full
+      [&_a]:max-md:whitespace-normal [&_a]:max-md:wrap-anywhere [&_span]:max-md:whitespace-normal
+      [&_span]:max-md:wrap-anywhere
+    "
   />
 </template>

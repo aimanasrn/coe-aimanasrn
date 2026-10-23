@@ -5,7 +5,6 @@
 
   const props = defineProps<{ product?: Product }>()
   const editing = computed(() => Boolean(props.product))
-  const notification = useActionToast()
 
   async function saved(product: Product) {
     useNuxtData<ProductResponse>(`product-${product.id}`).data.value = {
@@ -15,10 +14,6 @@
   }
 
   function cancel() {
-    notification.info(
-      editing.value ? 'Editing cancelled' : 'Product creation cancelled',
-      'No changes were saved.'
-    )
     return navigateTo(props.product ? `/products/${props.product.id}` : '/admin/products')
   }
 </script>
@@ -29,10 +24,22 @@
       :mode="editing ? 'edit' : 'add'"
       :product="product"
     />
-    <header class="page-header">
+    <header
+      class="
+        flex items-start justify-between gap-5 mb-7 [&_>_:is(button,_a)]:flex-none max-md:flex-wrap
+        max-md:gap-4.5 max-md:mb-6
+      "
+    >
       <div>
-        <h1>{{ editing ? 'Edit product' : 'Add product' }}</h1>
-        <p>
+        <h1
+          class="
+            m-0 text-heading text-[34px] font-semibold leading-[1.2] tracking-[-0.9px] wrap-anywhere
+            max-md:text-[30px]
+          "
+        >
+          {{ editing ? 'Edit product' : 'Add product' }}
+        </h1>
+        <p class="mt-[9px] text-muted text-base leading-[1.6] max-md:text-sm">
           {{
             editing
               ? 'Update product information, images and inventory.'

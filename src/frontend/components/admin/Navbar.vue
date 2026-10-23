@@ -32,7 +32,10 @@
         v-for="link in links"
         :key="link.to"
         :to="link.to"
-        class="rounded-lg px-3 py-2 text-sm font-medium text-body transition-colors hover:bg-primary-light hover:text-primary focus-visible:outline-2 focus-visible:outline-ring"
+        class="
+          rounded-lg px-3 py-2 text-sm font-medium text-body transition-colors hover:bg-primary-light
+          hover:text-primary focus-visible:outline-2 focus-visible:outline-ring
+        "
       >
         {{ link.label }}
       </NuxtLink>
@@ -51,7 +54,10 @@
       <button
         type="button"
         aria-label="Open navigation"
-        class="flex items-center justify-center rounded-lg p-2 text-heading hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-ring sm:hidden"
+        class="
+          flex items-center justify-center rounded-lg p-2 text-heading hover:bg-surface-muted
+          focus-visible:outline-2 focus-visible:outline-ring sm:hidden
+        "
       >
         <UIcon
           name="i-lucide-menu"
@@ -78,7 +84,10 @@
             <button
               type="button"
               aria-label="Close navigation"
-              class="rounded-lg p-2 text-heading hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-ring"
+              class="
+                rounded-lg p-2 text-heading hover:bg-surface-muted focus-visible:outline-2
+                focus-visible:outline-ring
+              "
               @click="isMenuOpen = false"
             >
               <UIcon
@@ -98,7 +107,10 @@
               v-for="link in links"
               :key="link.to"
               :to="link.to"
-              class="rounded-lg px-4 py-3 font-medium text-body transition-colors hover:bg-primary-light hover:text-primary focus-visible:outline-2 focus-visible:outline-ring"
+              class="
+                rounded-lg px-4 py-3 font-medium text-body transition-colors hover:bg-primary-light
+                hover:text-primary focus-visible:outline-2 focus-visible:outline-ring
+              "
               @click="isMenuOpen = false"
             >
               {{ link.label }}

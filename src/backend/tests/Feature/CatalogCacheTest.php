@@ -49,6 +49,7 @@ class CatalogCacheTest extends TestCase
         $this->authenticate($admin);
         $this->getJson('/api/products')->assertOk();
         $this->getJson('/api/categories')->assertOk();
+        $this->getJson('/api/categories?per_page=5&products=with')->assertOk()->assertJsonPath('total', 1);
         $this->getJson('/api/dashboard')->assertOk()->assertJsonPath('data.summary.stock_units', 10);
 
         DB::transaction(function () use ($product): void {
@@ -57,12 +58,17 @@ class CatalogCacheTest extends TestCase
         });
         $this->getJson('/api/products')->assertOk()->assertJsonPath('data.0.name', 'Changed')->assertJsonPath('data.0.category.name', 'Renamed category');
         $this->getJson('/api/categories')->assertOk()->assertJsonPath('data.0.name', 'Renamed category');
+        $this->getJson('/api/categories?per_page=5&products=with')->assertOk()->assertJsonPath('data.0.name', 'Renamed category');
         $this->getJson('/api/dashboard')->assertOk()->assertJsonPath('data.summary.stock_units', 3);
         $this->authenticate($customer);
         $this->getJson('/api/shop/products')->assertOk()->assertJsonPath('data.0.price', '20.00');
         $this->getJson("/api/shop/products/{$product->id}")->assertOk()->assertJsonPath('data.name', 'Changed');
         $this->getJson('/api/shop/categories')->assertOk()->assertJsonPath('data.0.name', 'Renamed category');
         $product->delete();
+        $this->authenticate($admin);
+        $this->getJson('/api/categories?per_page=5&products=with')->assertOk()->assertJsonPath('total', 0);
+        $this->getJson('/api/categories?per_page=5&products=empty')->assertOk()->assertJsonPath('total', 1);
+        $this->authenticate($customer);
         $this->getJson('/api/shop/products')->assertOk()->assertJsonCount(0, 'data');
         $this->getJson("/api/shop/products/{$product->id}")->assertNotFound();
         $product->category->delete();

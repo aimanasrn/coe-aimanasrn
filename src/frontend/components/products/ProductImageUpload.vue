@@ -4,14 +4,12 @@
   const entries = defineModel<ProductImageEntry[]>({ required: true })
   const props = defineProps<{ disabled?: boolean }>()
   const emit = defineEmits<{ error: [message: string] }>()
-  const notification = useActionToast()
   const inputId = useId()
   const objectUrls = new Set<string>()
   const dragging = ref(false)
 
   function rejectFiles(message: string) {
     emit('error', message)
-    notification.warning('Images could not be added', message)
   }
 
   function addFiles(files: FileList | null) {
@@ -38,10 +36,6 @@
     })
     entries.value = [...entries.value, ...additions]
     emit('error', '')
-    notification.info(
-      selected.length === 1 ? 'Image selected' : 'Images selected',
-      'Save the product to upload your selected images.'
-    )
   }
 
   function changed(event: Event) {
@@ -61,7 +55,6 @@
     if (entry && objectUrls.delete(entry.url)) URL.revokeObjectURL(entry.url)
     entries.value = entries.value.filter((image) => image.key !== key)
     emit('error', '')
-    notification.info('Image removed', 'Save the product to apply this change.')
   }
 
   onBeforeUnmount(() => {
@@ -73,8 +66,17 @@
   <div class="flex flex-col gap-[18px]">
     <label
       :for="inputId"
-      class="catalog-upload"
-      :class="{ 'catalog-upload--dragging': dragging, 'opacity-50 cursor-not-allowed!': disabled }"
+      class="
+        relative flex min-h-62.5 flex-col items-center justify-center gap-4 py-6 px-4 border
+        border-dashed border-[#cdd8d1] rounded-[10px] text-center cursor-pointer
+        transition-[background,border-color,color,box-shadow,transform] duration-150
+        hover:border-primary hover:bg-[#f7fbf8] focus-within:border-primary
+        focus-within:bg-[#f7fbf8] [&_>_span:last-child]:text-muted [&_>_span:last-child]:text-xs
+        [&_>_span:last-child]:leading-[1.6] data-[dragging=true]:border-primary
+        data-[dragging=true]:bg-[#f7fbf8]
+      "
+      :data-dragging="dragging"
+      :class="{ 'opacity-50 cursor-not-allowed!': disabled }"
       @dragover.prevent="dragging = !disabled"
       @dragleave.prevent="dragging = false"
       @drop.prevent="dropped"
@@ -90,40 +92,54 @@
         @change="changed"
       />
       <UIcon
+        class="w-10 h-10 text-[#74867a]"
         name="i-lucide-image-plus"
         mode="svg"
         aria-hidden="true"
       />
-      <strong>Click to upload or drag and drop</strong>
+      <strong class="text-body text-sm font-medium">Click to upload or drag and drop</strong>
       <span>JPG, PNG or WebP. Up to 6 images, 5 MB each.</span>
     </label>
     <div
       v-if="entries.length"
-      class="grid grid-cols-3 gap-3 [&_figure]:min-w-0 [&_figure>div]:relative [&_figure>div]:aspect-square [&_figure>div]:rounded-md [&_figure>div]:border [&_figure>div]:border-[#dce4df] [&_figure>div]:bg-[#f2f5f3] [&_img]:size-full [&_img]:rounded-md [&_img]:object-cover [&_button]:absolute [&_button]:top-[5px] [&_button]:right-[5px] [&_button]:grid [&_button]:size-[25px] [&_button]:cursor-pointer [&_button]:place-items-center [&_button]:rounded-full [&_button]:border [&_button]:border-[#dce4df] [&_button]:bg-white [&_button]:text-[#374f40] [&_button]:hover:bg-[#fff4f4] [&_button]:hover:text-danger [&_button_.iconify]:size-3.5 [&_figcaption]:pt-[7px] [&_figcaption]:text-center [&_figcaption]:text-xs [&_figcaption]:text-[#66746c]"
+      class="grid grid-cols-3 gap-3"
     >
       <figure
+        class="min-w-0"
         v-for="(image, index) in entries"
         :key="image.key"
       >
-        <div>
+        <div class="relative aspect-square rounded-md border border-[#dce4df] bg-[#f2f5f3]">
           <img
+            class="size-full rounded-md object-cover"
             :src="image.url"
             :alt="`Product image ${index + 1} preview`"
           />
           <button
+            class="
+              absolute top-[5px] right-[5px] grid size-[25px] cursor-pointer place-items-center
+              rounded-full border border-[#dce4df] bg-white text-[#374f40] hover:bg-[#fff4f4]
+              hover:text-danger
+            "
             type="button"
             :aria-label="`Remove image ${index + 1}`"
             :disabled="disabled"
             @click="remove(image.key)"
           >
             <UIcon
+              class="size-3.5"
               name="i-lucide-x"
               mode="svg"
               aria-hidden="true"
             />
           </button>
         </div>
-        <figcaption v-if="index === 0">Cover</figcaption>
+        <figcaption
+          class="pt-[7px] text-center text-xs text-[#66746c]"
+          v-if="index === 0"
+        >
+          Cover
+        </figcaption>
       </figure>
     </div>
     <p class="text-sm text-[#7b867f]">The first image is used as the cover.</p>

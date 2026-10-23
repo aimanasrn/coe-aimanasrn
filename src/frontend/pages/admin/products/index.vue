@@ -16,28 +16,46 @@
 
 <template>
   <section>
-    <header class="page-header">
+    <header
+      class="
+        flex items-start justify-between gap-5 mb-7 [&_>_:is(button,_a)]:flex-none max-md:flex-wrap
+        max-md:gap-4.5 max-md:mb-6
+      "
+    >
       <div>
-        <h1>Products</h1>
-        <p>Your catalog, all in one place.</p>
+        <h1
+          class="
+            m-0 text-heading text-[34px] font-semibold leading-[1.2] tracking-[-0.9px] wrap-anywhere
+            max-md:text-[30px]
+          "
+        >
+          Products
+        </h1>
+        <p class="mt-[9px] text-muted text-base leading-[1.6] max-md:text-sm">
+          Your catalog, all in one place.
+        </p>
       </div>
       <AddProductButton />
     </header>
     <div
-      v-if="error"
+      v-if="error && status === 'error'"
       class="mb-5 rounded-[7px] border px-[18px] py-3.5 text-sm border-[#f0d5d5] bg-[#fff4f4] text-[#a03939]"
       role="alert"
     >
       We could not load products.
       <button
-        class="catalog-link"
+        class="
+          inline-flex items-center gap-2 rounded-[3px] text-primary text-sm font-medium leading-normal
+          cursor-pointer [&_.iconify]:w-4.5 [&_.iconify]:h-4.5 [&_.iconify]:flex-none
+          hover:text-primary-hover hover:underline hover:underline-offset-4
+        "
         @click="refresh()"
       >
         Try again
       </button>
     </div>
     <div
-      v-if="!data && !error"
+      v-if="!data && (status === 'idle' || status === 'pending')"
       class="grid min-h-[420px] place-items-center"
     >
       <StudyMartLoader label="Loading products" />
