@@ -1,62 +1,132 @@
-## StudyMart documentation
+# StudyMart backend
 
-- [Local object storage](../../OBJECT_STORAGE.md): RustFS, Docker setup, Laravel configuration, console login, image import, testing, and troubleshooting.
+The Laravel 13 backend provides JWT authentication, customer profiles and carts, product browsing, and administrator APIs for the catalog and dashboard. API routes are defined in [`routes/api.php`](routes/api.php) and served under `/api`.
 
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+## Requirements
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+- PHP 8.5 to match the Docker development environment, with Composer 2 and the extensions required by `composer.lock`, including `pdo_pgsql`, `mbstring`, and `fileinfo`.
+- PostgreSQL (the Docker stack uses version 17).
+- Redis (the Docker stack uses version 7.4) for caching, sessions, and JWT invalidation.
 
-## About Laravel
+These instructions run Laravel directly on your host. Use Bash or Ubuntu/WSL, and keep PostgreSQL and Redis running. Node.js is only needed here if you work on Laravel's own Vite assets; the main web application runs separately in `src/frontend`.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## First-time setup
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 1. Create a PostgreSQL database
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Connect as a PostgreSQL administrator, for example with `sudo -u postgres psql` on Ubuntu, and run the following SQL once. Choose your own local password and use the same value in Laravel's environment file.
 
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+```sql
+CREATE USER studymart WITH PASSWORD 'replace_with_your_local_password';
+CREATE DATABASE studymart OWNER studymart;
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Use PostgreSQL for this project. Although `.env.example` defaults to SQLite, the product migration contains `ALTER TABLE ... ADD CONSTRAINT` statements that do not work with SQLite.
 
-## Contributing
+### 2. Install dependencies and configure Laravel
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+From the repository root:
 
-## Code of Conduct
+```bash
+cd src/backend
+cp -n .env.example .env
+composer install
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Edit **`src/backend/.env`** and replace the existing values with your local connection settings:
 
-## Security Vulnerabilities
+```dotenv
+APP_NAME=StudyMart
+APP_URL=http://localhost:8000
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=studymart
+DB_USERNAME=studymart
+DB_PASSWORD=replace_with_your_local_password
 
-## License
+SESSION_DRIVER=redis
+CACHE_STORE=redis
+REDIS_CLIENT=predis
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+REDIS_PASSWORD=null
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+FILESYSTEM_DISK=local
+PRODUCT_IMAGES_DISK=public
+```
+
+Keep the other example settings. If Redis requires a password, set `REDIS_PASSWORD` accordingly. Local public storage works without S3 credentials or Garage.
+
+### 3. Initialize the application
+
+Run from `src/backend`:
+
+```bash
+php artisan key:generate --no-interaction
+php artisan jwt:secret --no-interaction
+php artisan config:clear --no-interaction
+php artisan migrate --no-interaction
+php artisan storage:link --no-interaction
+```
+
+Generate the application and JWT keys once when setting up a new `.env`; preserve them on later starts. The storage link exposes locally stored images through `/storage`.
+
+Optionally add a sample Books category and Mathematics Workbook product:
+
+```bash
+php artisan db:seed --class=CatalogSeeder --no-interaction
+```
+
+### 4. Start the API
+
+```bash
+php artisan serve --host=127.0.0.1 --port=8000 --no-interaction
+```
+
+The API is available at `http://127.0.0.1:8000/api`. In another terminal, check Laravel's health endpoint:
+
+```bash
+curl --fail http://127.0.0.1:8000/up
+```
+
+Start the [frontend](../frontend/README.md) separately. The `/api/products` and `/api/categories` endpoints require an authenticated administrator; use `/up` to check that Laravel is running.
+
+## Local administrator setup
+
+Registration at <http://localhost:3000/register> creates a customer account. There is no automatically seeded administrator login.
+
+For local development, register your account first, then open Tinker from `src/backend`:
+
+```bash
+php artisan tinker
+```
+
+Run the following PHP, replacing the email with the account you registered:
+
+```php
+$user = App\Models\User::where('email', 'your-email@example.com')->firstOrFail();
+$user->role = App\UserRole::Admin;
+$user->save();
+```
+
+Exit Tinker, log out, and log in again before opening <http://localhost:3000/admin>.
+
+## Daily development and troubleshooting
+
+Run `php artisan serve --host=127.0.0.1 --port=8000 --no-interaction` from this directory to start again. After pulling new migrations, run `php artisan migrate --no-interaction`. After editing `.env`, run `php artisan config:clear --no-interaction` and restart the server.
+
+| Symptom | Check |
+| --- | --- |
+| Database connection refused | PostgreSQL is running and `DB_*` matches your local database. |
+| SQLite migration syntax error | Set `DB_CONNECTION=pgsql` and clear cached configuration. |
+| Redis connection refused | Redis is running and `REDIS_*` matches the server. |
+| Missing application key or JWT secret | Run the corresponding key generation command during first-time setup. |
+| Administrator page returns access denied | Promote your registered local account, then log in again. |
+| Images fail to load | Run `storage:link` and check `APP_URL` and `PRODUCT_IMAGES_DISK`. |
+| Port 8000 is occupied | Choose another `serve --port`, update `APP_URL`, and set the frontend's `NUXT_API_BASE` to match. |
+
+Feature tests rebuild database tables, so configure a separate PostgreSQL test database before running them. The committed `phpunit.xml` defaults to SQLite and needs PostgreSQL overrides for migrations to work. Do not point tests at your development database.
+
+For Docker startup and the current Garage configuration prerequisite, see the [root README](../../README.md#docker-development). The [older object storage guide](../../OBJECT_STORAGE.md) documents RustFS and does not match the current Garage services.
