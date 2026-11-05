@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import '@nuxt/ui';
+@import './landing.css';
 
 @font-face {
   font-family: 'Nunito';
@@ -9,97 +10,37 @@
   font-display: swap;
 }
 
-:root {
-  --ui-primary: #21684c;
-  --ui-text: #47534e;
-  --ui-text-muted: #747e7a;
-  --ui-text-dimmed: #939c97;
-  --ui-text-highlighted: #182322;
-  --ui-bg: #ffffff;
-  --ui-bg-muted: #f7f9f8;
-  --ui-bg-elevated: #ffffff;
-  --ui-border: #e2e8e5;
-  --ui-border-muted: #edf0ee;
-  --ui-border-accented: #cdd8d1;
-}
+@theme static {
+  --font-sans: 'Nunito', ui-sans-serif, system-ui, sans-serif;
 
-@theme {
-  --text-xs: 0.8125rem;
-  --text-xs--line-height: 1.5;
-  --text-sm: 0.9375rem;
-  --text-sm--line-height: 1.5;
-  --text-lg: 1.25rem;
-  --text-xl: 1.375rem;
+  /* StudyMart green. 700 is the brand color used for actions in light mode. */
+  --color-brand-50: #effaf4;
+  --color-brand-100: #d8f3e3;
+  --color-brand-200: #b4e6cb;
+  --color-brand-300: #82d2ab;
+  --color-brand-400: #4fb787;
+  --color-brand-500: #2d9b6c;
+  --color-brand-600: #207d57;
+  --color-brand-700: #21684c;
+  --color-brand-800: #1b5340;
+  --color-brand-900: #174535;
+  --color-brand-950: #0b271e;
 
-  /* Brand — buttons, links, active navigation */
-  --font-sans: Arial, Helvetica, sans-serif;
-  --color-primary: #21684c;
-  --color-brand-deep: #123c30;
-  --color-primary-hover: #18543d;
-  --color-primary-light: #dcfce7;
-  --color-primary-foreground: #ffffff;
+  /* Green-tinted grays for text, borders and backgrounds. */
+  --color-sage-50: #f7f9f8;
+  --color-sage-100: #edf1ef;
+  --color-sage-200: #e2e8e5;
+  --color-sage-300: #cdd8d1;
+  --color-sage-400: #939c97;
+  --color-sage-500: #747e7a;
+  --color-sage-600: #5b6661;
+  --color-sage-700: #47534e;
+  --color-sage-800: #26302d;
+  --color-sage-900: #161f1d;
+  --color-sage-950: #0d1312;
 
-  /* Backgrounds — pages, cards, highlighted sections */
-  --color-background: #ffffff;
-  --color-surface: #ffffff;
-  --color-surface-muted: #f7f9f8;
-  --color-secondary: #edf5f0;
-  --color-secondary-foreground: #14532d;
-
-  /* Text */
-  --color-heading: #182322;
-  --color-body: #47534e;
-  --color-muted: #747e7a;
-
-  /* Borders and keyboard focus */
-  --color-border: #e2e8e5;
-  --color-ring: #21684c;
-
-  /* Footer */
-  --color-footer: #0d3528;
-  --color-footer-foreground: #ffffff;
-  --color-footer-muted: #b8cec3;
-
-  /* Accent — ratings, promotions */
-  --color-accent: #facc15;
-  --color-accent-light: #fef9c3;
-  --color-accent-foreground: #713f12;
-
-  /* Status — stock, orders, validation */
-  --color-success: #15803d;
-  --color-success-light: #dcfce7;
-
-  --color-warning: #92400e;
-  --color-warning-light: #fef3c7;
-
-  --color-danger: #dc2626;
-  --color-danger-light: #fee2e2;
-
-  --color-info: #1d4ed8;
-  --color-info-light: #dbeafe;
-}
-
-@layer base {
-  body {
-    @apply bg-background text-body;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    @apply text-heading;
-  }
-}
-@theme {
   --animate-bag-bob: bag-bob 2s ease-in-out infinite;
-  --animate-bag-shadow: bag-shadow 2s ease-in-out infinite;
   --animate-loading-progress: loading-progress 1.8s ease-in-out infinite;
-  --animate-toast-enter: toast-enter 400ms cubic-bezier(0.16, 1, 0.3, 1);
-  --animate-toast-leave: toast-leave 200ms ease-in forwards;
 
   @keyframes bag-bob {
     0%,
@@ -111,18 +52,6 @@
     }
   }
 
-  @keyframes bag-shadow {
-    0%,
-    100% {
-      transform: scaleX(1);
-      opacity: 0.12;
-    }
-    50% {
-      transform: scaleX(0.8);
-      opacity: 0.08;
-    }
-  }
-
   @keyframes loading-progress {
     0% {
       transform: translateX(-100%);
@@ -131,25 +60,24 @@
       transform: translateX(250%);
     }
   }
+}
 
-  @keyframes toast-enter {
-    from {
-      opacity: 0;
-      translate: 0 -20px;
-      scale: 0.95;
-    }
-    to {
-      opacity: 1;
-      translate: 0 0;
-      scale: 1;
-    }
-  }
+:root {
+  /* The darker brand shade keeps white button text readable. */
+  --ui-primary: var(--ui-color-primary-700);
+  --ui-radius: 0.375rem;
+}
 
-  @keyframes toast-leave {
-    to {
-      opacity: 0;
-      translate: 80px 0;
-      scale: 0.95;
-    }
+.dark {
+  --ui-primary: var(--ui-color-primary-400);
+  --ui-bg: var(--ui-color-neutral-950);
+  --ui-bg-muted: var(--ui-color-neutral-900);
+  --ui-bg-elevated: var(--ui-color-neutral-800);
+  --ui-border: var(--ui-color-neutral-800);
+}
+
+@layer base {
+  :focus-visible {
+    outline-color: var(--ui-primary);
   }
 }

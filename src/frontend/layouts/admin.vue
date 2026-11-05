@@ -1,26 +1,70 @@
 <script setup lang="ts">
-  import Sidebar from '~/components/admin/Sidebar.vue'
+  import SidebarNavigation from '~/components/admin/SidebarNavigation.vue'
+
+  const route = useRoute()
+  const menuOpen = ref(false)
+  watch(
+    () => route.fullPath,
+    () => {
+      menuOpen.value = false
+    }
+  )
 </script>
 
 <template>
-  <div
-    class="
-      min-h-svh pl-68 bg-surface-muted text-body text-base
-      [&_:is(a,_button):focus-visible]:outline-2 [&_:is(a,_button):focus-visible]:outline-solid
-      [&_:is(a,_button):focus-visible]:outline-primary
-      [&_:is(a,_button):focus-visible]:outline-offset-4 [&_button:disabled]:opacity-50
-      [&_button:disabled]:cursor-not-allowed max-md:pl-0 motion-reduce:[&_*]:scroll-auto
-      motion-reduce:[&_*]:duration-0
-    "
-  >
-    <Sidebar />
-    <main
-      class="
-        w-full max-w-410 min-w-0 my-0 mx-auto py-10 px-8 min-[1700px]:pr-10 min-[1700px]:pl-10
-        max-md:pt-26 max-md:px-5 max-md:pb-7
-      "
+  <div class="min-h-svh bg-muted">
+    <aside
+      aria-label="Admin sidebar"
+      class="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-default bg-default lg:block"
     >
-      <slot />
+      <SidebarNavigation />
+    </aside>
+
+    <header
+      class="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-default bg-default/90 px-4 backdrop-blur lg:hidden"
+    >
+      <NuxtLink
+        to="/admin"
+        aria-label="StudyMart admin home"
+      >
+        <StudyMartLogo />
+      </NuxtLink>
+      <div class="flex items-center gap-1">
+        <ColorModeToggle />
+        <USlideover
+          v-model:open="menuOpen"
+          side="left"
+          title="StudyMart Admin"
+          description="Admin navigation"
+          :ui="{ content: 'max-w-72' }"
+        >
+          <UButton
+            icon="i-lucide-menu"
+            color="neutral"
+            variant="ghost"
+            aria-label="Open navigation"
+          />
+          <template #content>
+            <div class="relative h-full">
+              <UButton
+                icon="i-lucide-x"
+                color="neutral"
+                variant="ghost"
+                aria-label="Close navigation"
+                class="absolute top-4 right-3 z-10"
+                @click="menuOpen = false"
+              />
+              <SidebarNavigation />
+            </div>
+          </template>
+        </USlideover>
+      </div>
+    </header>
+
+    <main class="lg:pl-64">
+      <div class="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-10 lg:py-10">
+        <slot />
+      </div>
     </main>
   </div>
 </template>

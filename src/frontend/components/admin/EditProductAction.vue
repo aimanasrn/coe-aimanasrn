@@ -5,15 +5,12 @@
 
 <template>
   <UTooltip text="Edit product">
-    <AppIconButton
+    <UButton
       :to="`/admin/products/${product.id}/edit`"
+      icon="i-lucide-pencil"
+      color="neutral"
+      variant="ghost"
       :aria-label="`Edit ${product.name}`"
-    >
-      <UIcon
-        name="i-lucide-pencil"
-        mode="svg"
-        aria-hidden="true"
-      />
-    </AppIconButton>
+    />
   </UTooltip>
 </template>

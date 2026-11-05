@@ -3,7 +3,7 @@
   import ProfilePhotoForm from '~/components/auth/ProfilePhotoForm.vue'
   import { authFormError } from '~/utils/auth'
 
-  definePageMeta({ layout: false, colorMode: 'light' })
+  definePageMeta({ layout: false })
   useHead({ title: 'My profile · StudyMart' })
   const route = useRoute()
   const ready = ref(false)
@@ -83,184 +83,164 @@
 </script>
 
 <template>
-  <div>
-    <section>
-      <div class="mb-8 flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 class="text-[32px] font-semibold tracking-tight text-heading">My profile</h1>
-          <p class="mt-2 text-sm leading-6 text-muted">
-            Manage your personal details and account security.
-          </p>
-        </div>
-        <span
-          class="
-            mt-2 inline-flex items-center gap-1.5 rounded-full border border-[#cfe7d5] bg-[#edf8f0] px-3
-            py-1 text-xs font-medium text-primary
-          "
-          ><UIcon
-            :name="isAdmin ? 'i-lucide-shield-check' : 'i-lucide-user-round'"
-            class="size-3.5"
-            aria-hidden="true"
-          />{{ isAdmin ? 'Admin' : 'Customer' }}</span
-        >
-      </div>
-      <p
-        v-if="route.query.access === 'restricted'"
-        role="status"
-        class="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900"
-      >
-        Catalog management is available to admins. You can manage your account here.
-      </p>
+  <section class="mx-auto max-w-4xl">
+    <PageHeader
+      title="My profile"
+      description="Manage your personal details and account security."
+    >
+      <template #actions>
+        <UBadge
+          :icon="isAdmin ? 'i-lucide-shield-check' : 'i-lucide-user-round'"
+          :label="isAdmin ? 'Admin' : 'Customer'"
+          variant="subtle"
+          size="lg"
+          class="rounded-full"
+        />
+      </template>
+    </PageHeader>
 
+    <UAlert
+      v-if="route.query.access === 'restricted'"
+      class="mb-6"
+      color="warning"
+      variant="subtle"
+      icon="i-lucide-lock"
+      role="status"
+      description="Catalog management is available to admins. You can manage your account here."
+    />
+
+    <div class="flex flex-col gap-6">
       <ProfilePhotoForm
-        class="mb-6"
         :disabled="!!saving || !ready"
         @busy="saving = $event ? 'photo' : null"
       />
 
-      <section
+      <UCard
+        as="section"
         aria-labelledby="details-title"
-        class="
-          grid gap-6 rounded-2xl border border-border bg-surface p-6 sm:p-6 md:grid-cols-[1fr_1.3fr]
-          md:gap-10
-        "
       >
-        <div>
-          <h2
-            id="details-title"
-            class="text-lg font-semibold text-heading"
+        <div class="grid gap-6 md:grid-cols-[1fr_1.4fr] md:gap-10">
+          <div>
+            <h2
+              id="details-title"
+              class="font-semibold text-highlighted"
+            >
+              Personal information
+            </h2>
+            <p class="mt-1 text-sm text-muted">Keep your name and email address up to date.</p>
+          </div>
+          <form
+            method="post"
+            class="flex flex-col gap-4"
+            :aria-busy="saving === 'details'"
+            @submit.prevent="saveDetails"
           >
-            Personal information
-          </h2>
-          <p class="mt-2 text-sm leading-6 text-muted">
-            Keep your name and email address up to date.
-          </p>
+            <AuthField
+              id="profile-name"
+              v-model="name"
+              label="Full name"
+              autocomplete="name"
+              :maxlength="100"
+              :disabled="!!saving || !ready"
+              :error="detailsErrors.name?.[0]"
+            />
+            <AuthField
+              id="profile-email"
+              v-model="email"
+              label="Email address"
+              type="email"
+              autocomplete="email"
+              :maxlength="254"
+              :disabled="!!saving || !ready"
+              :error="detailsErrors.email?.[0]"
+            />
+            <AuthField
+              v-if="changingEmail"
+              id="email-current-password"
+              v-model="emailPassword"
+              label="Current password"
+              type="password"
+              autocomplete="current-password"
+              hint="Confirm your password to change your email address."
+              :disabled="!!saving || !ready"
+              :error="detailsErrors.current_password?.[0]"
+            />
+            <div>
+              <UButton
+                type="submit"
+                :loading="saving === 'details'"
+                :disabled="(!!saving && saving !== 'details') || !ready"
+                :label="saving === 'details' ? 'Saving…' : 'Save changes'"
+              />
+            </div>
+          </form>
         </div>
-        <form
-          method="post"
-          class="space-y-5"
-          :aria-busy="saving === 'details'"
-          @submit.prevent="saveDetails"
-        >
-          <AuthField
-            id="profile-name"
-            v-model="name"
-            label="Full name"
-            autocomplete="name"
-            :maxlength="100"
-            :disabled="!!saving || !ready"
-            :error="detailsErrors.name?.[0]"
-          />
-          <AuthField
-            id="profile-email"
-            v-model="email"
-            label="Email address"
-            type="email"
-            autocomplete="email"
-            :maxlength="254"
-            :disabled="!!saving || !ready"
-            :error="detailsErrors.email?.[0]"
-          />
-          <AuthField
-            v-if="changingEmail"
-            id="email-current-password"
-            v-model="emailPassword"
-            label="Current password"
-            type="password"
-            autocomplete="current-password"
-            hint="Confirm your password to change your email address."
-            :disabled="!!saving || !ready"
-            :error="detailsErrors.current_password?.[0]"
-          />
+      </UCard>
 
-          <button
-            type="submit"
-            :disabled="!!saving || !ready"
-            class="
-              inline-flex items-center justify-center gap-2.5 min-h-12 py-3 px-5.5 rounded-lg bg-primary
-              text-white font-semibold cursor-pointer
-              transition-[background,border-color,color,box-shadow,transform] duration-150
-              hover:bg-primary-hover active:translate-y-px disabled:opacity-60 disabled:cursor-wait
-              focus-visible:outline-solid text-sm focus-visible:outline-2 focus-visible:outline-offset-4
-              focus-visible:outline-primary
-            "
-          >
-            {{ saving === 'details' ? 'Saving…' : 'Save changes' }}
-          </button>
-        </form>
-      </section>
-
-      <section
+      <UCard
+        as="section"
         aria-labelledby="password-title"
-        class="
-          mt-6 grid gap-6 rounded-2xl border border-border bg-surface p-6 sm:p-6
-          md:grid-cols-[1fr_1.3fr] md:gap-10
-        "
       >
-        <div>
-          <h2
-            id="password-title"
-            class="text-lg font-semibold text-heading"
+        <div class="grid gap-6 md:grid-cols-[1fr_1.4fr] md:gap-10">
+          <div>
+            <h2
+              id="password-title"
+              class="font-semibold text-highlighted"
+            >
+              Change password
+            </h2>
+            <p class="mt-1 text-sm text-muted">
+              Choose a password with at least 8 characters. Changing it signs out your other
+              sessions.
+            </p>
+          </div>
+          <form
+            method="post"
+            class="flex flex-col gap-4"
+            :aria-busy="saving === 'password'"
+            @submit.prevent="savePassword"
           >
-            Change password
-          </h2>
-          <p class="mt-2 text-sm leading-6 text-muted">
-            Choose a password with at least 8 characters. Changing it signs out your other sessions.
-          </p>
+            <AuthField
+              id="current-password"
+              v-model="currentPassword"
+              label="Current password"
+              type="password"
+              autocomplete="current-password"
+              :disabled="!!saving || !ready"
+              :error="passwordErrors.current_password?.[0]"
+            />
+            <AuthField
+              id="new-password"
+              v-model="password"
+              label="New password"
+              type="password"
+              autocomplete="new-password"
+              :minlength="8"
+              :maxlength="72"
+              :disabled="!!saving || !ready"
+              :error="passwordErrors.password?.[0]"
+            />
+            <AuthField
+              id="confirm-new-password"
+              v-model="confirmation"
+              label="Confirm new password"
+              type="password"
+              autocomplete="new-password"
+              :maxlength="72"
+              :disabled="!!saving || !ready"
+              :error="passwordErrors.password_confirmation?.[0]"
+            />
+            <div>
+              <UButton
+                type="submit"
+                :loading="saving === 'password'"
+                :disabled="(!!saving && saving !== 'password') || !ready"
+                :label="saving === 'password' ? 'Updating…' : 'Update password'"
+              />
+            </div>
+          </form>
         </div>
-        <form
-          method="post"
-          class="space-y-5"
-          :aria-busy="saving === 'password'"
-          @submit.prevent="savePassword"
-        >
-          <AuthField
-            id="current-password"
-            v-model="currentPassword"
-            label="Current password"
-            type="password"
-            autocomplete="current-password"
-            :disabled="!!saving || !ready"
-            :error="passwordErrors.current_password?.[0]"
-          />
-          <AuthField
-            id="new-password"
-            v-model="password"
-            label="New password"
-            type="password"
-            autocomplete="new-password"
-            :minlength="8"
-            :maxlength="72"
-            :disabled="!!saving || !ready"
-            :error="passwordErrors.password?.[0]"
-          />
-          <AuthField
-            id="confirm-new-password"
-            v-model="confirmation"
-            label="Confirm new password"
-            type="password"
-            autocomplete="new-password"
-            :maxlength="72"
-            :disabled="!!saving || !ready"
-            :error="passwordErrors.password_confirmation?.[0]"
-          />
-
-          <button
-            type="submit"
-            :disabled="!!saving || !ready"
-            class="
-              inline-flex items-center justify-center gap-2.5 min-h-12 py-3 px-5.5 rounded-lg bg-primary
-              text-white font-semibold cursor-pointer
-              transition-[background,border-color,color,box-shadow,transform] duration-150
-              hover:bg-primary-hover active:translate-y-px disabled:opacity-60 disabled:cursor-wait
-              focus-visible:outline-solid text-sm focus-visible:outline-2 focus-visible:outline-offset-4
-              focus-visible:outline-primary
-            "
-          >
-            {{ saving === 'password' ? 'Updating…' : 'Update password' }}
-          </button>
-        </form>
-      </section>
-    </section>
-  </div>
+      </UCard>
+    </div>
+  </section>
 </template>

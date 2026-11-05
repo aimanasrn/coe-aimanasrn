@@ -1,5 +1,4 @@
 <script setup lang="ts">
-  import { catalogFormUi } from '~/utils/formUi'
   import type { FormError, FormErrorEvent } from '@nuxt/ui'
   import type { Category, CategoryResponse } from '~/types/catalog'
 
@@ -23,15 +22,9 @@
     const errors: FormError[] = []
     if (!form.name.trim()) errors.push({ name: 'name', message: 'Please fill in this field.' })
     else if (form.name.trim().length > 100)
-      errors.push({
-        name: 'name',
-        message: 'Please use 100 characters or fewer.'
-      })
+      errors.push({ name: 'name', message: 'Please use 100 characters or fewer.' })
     if (form.description.trim().length > 5000)
-      errors.push({
-        name: 'description',
-        message: 'Please use 5,000 characters or fewer.'
-      })
+      errors.push({ name: 'description', message: 'Please use 5,000 characters or fewer.' })
     return errors
   }
 
@@ -68,13 +61,13 @@
         messages[0] ? [{ name, message: messages[0] }] : []
       )
       categoryForm.value?.setErrors(errors)
-      const message = errors.length
-        ? 'Please check the highlighted fields.'
-        : 'We could not save this category. Please try again.'
       if (errors.length) {
-        notification.warning('Please check the form', message)
+        notification.warning('Please check the form', 'Please check the highlighted fields.')
       } else {
-        notification.error('Category was not saved', message)
+        notification.error(
+          'Category was not saved',
+          'We could not save this category. Please try again.'
+        )
       }
     } finally {
       saving.value = false
@@ -99,50 +92,44 @@
       name="name"
       label="Category name"
       required
-      :ui="catalogFormUi.field"
     >
       <UInput
-        :ui="catalogFormUi.input"
         id="category-name"
         v-model="form.name"
         required
         :maxlength="100"
         autofocus
+        size="lg"
         class="w-full"
       />
     </UFormField>
     <UFormField
       name="description"
-      :ui="catalogFormUi.field"
+      label="Description"
+      hint="Optional"
     >
-      <template #label>
-        Description
-        <span>(optional)</span>
-      </template>
       <UTextarea
-        :ui="catalogFormUi.textarea"
         id="category-description"
         v-model="form.description"
         :rows="4"
         :maxlength="5000"
+        autoresize
         class="w-full"
       />
     </UFormField>
-    <div class="flex justify-end gap-3 pt-[5px]">
-      <AppButton
-        type="button"
-        variant="secondary"
+    <div class="flex justify-end gap-2 pt-1">
+      <UButton
+        label="Cancel"
+        color="neutral"
+        variant="outline"
         :disabled="saving"
         @click="emit('cancel')"
-      >
-        Cancel
-      </AppButton>
-      <AppButton
+      />
+      <UButton
         type="submit"
-        :disabled="saving"
-      >
-        {{ saving ? 'Saving category...' : category ? 'Save changes' : 'Save category' }}
-      </AppButton>
+        :loading="saving"
+        :label="saving ? 'Saving category...' : category ? 'Save changes' : 'Save category'"
+      />
     </div>
   </UForm>
 </template>

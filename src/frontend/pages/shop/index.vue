@@ -2,13 +2,20 @@
   import ShopProductCard from '~/components/shop/ShopProductCard.vue'
   import type { ShopPage } from '~/types/shop'
   import type { Category } from '~/types/catalog'
-  definePageMeta({ layout: 'shop', colorMode: 'light' })
+
+  definePageMeta({ layout: 'shop' })
   useHead({ title: 'Shop · StudyMart' })
   const search = ref('')
   const query = ref('')
   const category = ref('')
   const sort = ref('newest')
   const page = ref(1)
+  const sortItems = [
+    { label: 'Newest first', value: 'newest' },
+    { label: 'Price: low to high', value: 'price_asc' },
+    { label: 'Price: high to low', value: 'price_desc' },
+    { label: 'Name: A–Z', value: 'name' }
+  ]
   const { data, status, error, refresh } = useLazyFetch<ShopPage>('/api/shop/products', {
     server: false,
     query: { q: query, category: computed(() => category.value || undefined), sort, page }
@@ -20,138 +27,139 @@
   watch([category, sort], () => {
     page.value = 1
   })
+
   function findProducts() {
     page.value = 1
     query.value = search.value.trim()
   }
+
+  function clearSearch() {
+    search.value = ''
+    findProducts()
+  }
 </script>
+
 <template>
   <section>
-    <header class="flex items-end justify-between flex-wrap gap-5 mb-8">
-      <div>
-        <h1
-          class="
-            text-[36px] leading-[1.2] font-[650] tracking-[-1px] text-heading wrap-anywhere
-            max-[761px]:text-[30px]
-          "
+    <PageHeader
+      title="Your study essentials"
+      description="Books, stationery, and everything for your next chapter."
+    >
+      <template #actions>
+        <UBadge
+          v-if="data"
+          :label="`${data.total} ${data.total === 1 ? 'product' : 'products'}`"
+          color="neutral"
+          variant="subtle"
+          size="lg"
+          class="rounded-full"
+        />
+      </template>
+    </PageHeader>
+
+    <div class="mb-8 flex flex-col gap-4">
+      <div class="flex flex-col gap-3 sm:flex-row">
+        <form
+          role="search"
+          class="flex flex-1 gap-2"
+          @submit.prevent="findProducts"
         >
-          Your study essentials
-        </h1>
-        <p class="mt-3 text-base leading-[1.6] text-muted">
-          Books, stationery, and everything for your next chapter.
-        </p>
+          <UInput
+            v-model="search"
+            type="search"
+            icon="i-lucide-search"
+            placeholder="Search your next essential..."
+            aria-label="Search products"
+            :maxlength="150"
+            size="lg"
+            class="flex-1"
+          />
+          <UButton
+            type="submit"
+            label="Search"
+            size="lg"
+          />
+        </form>
+        <USelect
+          v-model="sort"
+          :items="sortItems"
+          icon="i-lucide-arrow-up-down"
+          aria-label="Sort products"
+          size="lg"
+          class="sm:w-56"
+        />
       </div>
-      <span
-        v-if="data"
-        class="text-sm text-muted"
-        >{{ data.total }} products</span
-      >
-    </header>
-    <div class="flex gap-3 mb-8 items-center max-[1101px]:flex-wrap max-[481px]:gap-2.5">
-      <form
-        class="
-          flex items-center gap-3 pl-4 border border-border bg-white rounded-[10px] flex-1 min-w-0
-          focus-within:outline-2 focus-within:outline-solid focus-within:outline-primary
-          focus-within:outline-offset-2 max-[1101px]:basis-full max-[481px]:pl-3 max-[481px]:gap-2
-        "
-        role="search"
-        @submit.prevent="findProducts"
-      >
-        <UIcon
-          name="i-lucide-search"
-          class="size-5 text-muted"
-          aria-hidden="true"
-        />
-        <input
-          class="w-full min-w-0 text-sm outline-none py-3.5 px-0 max-[481px]:text-[14px]"
-          v-model="search"
-          type="search"
-          aria-label="Search products"
-          placeholder="Search your next essential..."
-          maxlength="150"
-        />
-        <AppButton
-          class="m-1 py-2.5 px-4 min-h-10 max-[481px]:p-2.5 max-[481px]:text-xs"
-          type="submit"
-        >
-          Search
-        </AppButton>
-      </form>
-      <select
-        v-model="category"
+
+      <div
+        role="group"
         aria-label="Filter by category"
-        class="
-          max-w-full pt-3.5 pr-8 pb-3.5 pl-3.5 min-h-12.5 border border-border rounded-[10px] bg-white
-          text-sm text-body focus-visible:outline-2 focus-visible:outline-solid
-          focus-visible:outline-primary focus-visible:outline-offset-2 max-[761px]:flex-1
-          max-[761px]:min-w-0 max-[761px]:text-[14px]
-        "
+        class="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1"
       >
-        <option value="">All categories</option>
-        <option
+        <UButton
+          label="All"
+          size="sm"
+          class="shrink-0 rounded-full"
+          :color="category === '' ? 'primary' : 'neutral'"
+          :variant="category === '' ? 'solid' : 'outline'"
+          :aria-pressed="category === ''"
+          @click="category = ''"
+        />
+        <UButton
           v-for="item in categories?.data"
           :key="item.id"
-          :value="String(item.id)"
-        >
-          {{ item.name }}
-        </option>
-      </select>
-      <select
-        v-model="sort"
-        aria-label="Sort products"
-        class="
-          max-w-full pt-3.5 pr-8 pb-3.5 pl-3.5 min-h-12.5 border border-border rounded-[10px] bg-white
-          text-sm text-body focus-visible:outline-2 focus-visible:outline-solid
-          focus-visible:outline-primary focus-visible:outline-offset-2 max-[761px]:flex-1
-          max-[761px]:min-w-0 max-[761px]:text-[14px]
-        "
+          :label="item.name"
+          size="sm"
+          class="shrink-0 rounded-full"
+          :color="category === String(item.id) ? 'primary' : 'neutral'"
+          :variant="category === String(item.id) ? 'solid' : 'outline'"
+          :aria-pressed="category === String(item.id)"
+          @click="category = String(item.id)"
+        />
+      </div>
+
+      <p
+        v-if="query"
+        class="flex flex-wrap items-center gap-2 text-sm text-muted"
       >
-        <option value="newest">Newest first</option>
-        <option value="price_asc">Price: low to high</option>
-        <option value="price_desc">Price: high to low</option>
-        <option value="name">Name: A–Z</option>
-      </select>
+        Results for <strong class="text-highlighted">“{{ query }}”</strong>
+        <UButton
+          label="Clear search"
+          size="xs"
+          color="neutral"
+          variant="link"
+          @click="clearSearch"
+        />
+      </p>
     </div>
-    <div
+
+    <EmptyState
       v-if="error && status === 'error'"
-      class="
-        flex min-h-87.5 flex-col items-center justify-center text-center gap-4.5 py-10 px-4
-        [&_p]:text-muted [&_p]:leading-[1.7]
-      "
       role="alert"
+      icon="i-lucide-cloud-off"
+      title="We couldn’t load the shop."
+      description="Please check your connection and try again."
     >
-      <h2 class="text-[24px] leading-[1.4] font-semibold">We couldn’t load the shop.</h2>
-      <AppButton @click="refresh()"> Try again </AppButton>
-    </div>
+      <UButton
+        label="Try again"
+        icon="i-lucide-refresh-cw"
+        @click="refresh()"
+      />
+    </EmptyState>
     <div
       v-else-if="status === 'idle' || status === 'pending'"
-      class="
-        flex min-h-87.5 flex-col items-center justify-center text-center gap-4.5 py-10 px-4
-        [&_h2]:text-[24px] [&_h2]:leading-[1.4] [&_h2]:font-semibold [&_p]:text-muted
-        [&_p]:leading-[1.7]
-      "
+      class="grid min-h-87.5 place-items-center"
     >
       <StudyMartLoader label="Loading products" />
     </div>
-    <div
-      v-else-if="!data.data.length"
-      class="flex min-h-87.5 flex-col items-center justify-center text-center gap-4.5 py-10 px-4"
-    >
-      <UIcon
-        name="i-lucide-search"
-        class="size-10 text-muted"
-        aria-hidden="true"
-      />
-      <h2 class="text-[24px] leading-[1.4] font-semibold">No products found</h2>
-      <p class="text-muted leading-[1.7]">Try another search or category.</p>
-    </div>
+    <EmptyState
+      v-else-if="!data?.data.length"
+      icon="i-lucide-search-x"
+      title="No products found"
+      description="Try another search or category."
+    />
     <div
       v-else
-      class="
-        grid grid-cols-4 gap-6 max-[1101px]:grid-cols-3 max-[761px]:grid-cols-2 max-[761px]:gap-y-6
-        max-[761px]:gap-x-4 max-[481px]:gap-y-6 max-[481px]:gap-x-3.5
-      "
-      :aria-busy="status === 'pending'"
+      class="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4"
     >
       <ShopProductCard
         v-for="product in data.data"
@@ -159,26 +167,19 @@
         :product="product"
       />
     </div>
+
     <nav
       v-if="data && data.last_page > 1"
-      class="mt-10 flex flex-wrap items-center justify-center gap-4.5 text-[14px]"
+      class="mt-10 flex justify-center"
       aria-label="Product pages"
     >
-      <AppButton
-        variant="secondary"
-        :disabled="page <= 1 || status === 'pending'"
-        @click="page--"
-      >
-        Previous
-      </AppButton>
-      <span>Page {{ data.current_page }} of {{ data.last_page }}</span>
-      <AppButton
-        variant="secondary"
-        :disabled="page >= data.last_page || status === 'pending'"
-        @click="page++"
-      >
-        Next
-      </AppButton>
+      <UPagination
+        v-model:page="page"
+        :total="data.total"
+        :items-per-page="data.per_page"
+        :disabled="status === 'pending'"
+        :sibling-count="1"
+      />
     </nav>
   </section>
 </template>

@@ -1,6 +1,8 @@
 <script setup lang="ts">
   import CartLine from '~/components/shop/CartLine.vue'
-  definePageMeta({ layout: 'shop', colorMode: 'light' })
+  import { formatMoney } from '~/utils/catalog'
+
+  definePageMeta({ layout: 'shop' })
   useHead({ title: 'Your cart · StudyMart' })
   const { cart, busy, loading, error, refresh, clear } = useCart()
 
@@ -9,130 +11,120 @@
     if (!loading.value) void refresh()
   })
 </script>
+
 <template>
   <section>
-    <header class="flex items-end justify-between flex-wrap gap-5 mb-8">
-      <div>
-        <h1
-          class="
-            text-[36px] leading-[1.2] font-[650] tracking-[-1px] text-heading wrap-anywhere
-            max-[761px]:text-[30px]
-          "
-        >
-          Your cart
-        </h1>
-        <p class="mt-3 text-base leading-[1.6] text-muted">
-          A few good things for your next study session.
-        </p>
-      </div>
-      <NuxtLink
-        to="/shop"
-        class="inline-flex items-center gap-2 text-sm text-primary font-semibold"
-        ><UIcon
-          class="w-4.5 h-4.5"
-          name="i-lucide-arrow-left"
-          aria-hidden="true"
-        />Continue shopping</NuxtLink
-      >
-    </header>
-    <div
-      v-if="error"
-      class="
-        flex min-h-87.5 flex-col items-center justify-center text-center gap-4.5 py-10 px-4
-        [&_p]:text-muted [&_p]:leading-[1.7]
-      "
-      role="alert"
+    <PageHeader
+      title="Your cart"
+      description="A few good things for your next study session."
     >
-      <h2 class="text-[24px] leading-[1.4] font-semibold">{{ error }}</h2>
-      <AppButton @click="refresh()"> Try again </AppButton>
-    </div>
+      <template #actions>
+        <UButton
+          to="/shop"
+          label="Continue shopping"
+          icon="i-lucide-arrow-left"
+          color="neutral"
+          variant="outline"
+        />
+      </template>
+    </PageHeader>
+
+    <EmptyState
+      v-if="error"
+      role="alert"
+      icon="i-lucide-cloud-off"
+      :title="error"
+    >
+      <UButton
+        label="Try again"
+        icon="i-lucide-refresh-cw"
+        @click="refresh()"
+      />
+    </EmptyState>
     <div
       v-else-if="loading || !cart"
-      class="
-        flex min-h-87.5 flex-col items-center justify-center text-center gap-4.5 py-10 px-4
-        [&_h2]:text-[24px] [&_h2]:leading-[1.4] [&_h2]:font-semibold [&_p]:text-muted
-        [&_p]:leading-[1.7]
-      "
+      class="grid min-h-87.5 place-items-center"
     >
       <StudyMartLoader label="Loading your cart" />
     </div>
-    <div
-      v-else-if="!cart.items.length"
-      class="flex flex-col items-center justify-center text-center gap-4.5 py-10 px-4 min-h-115"
-    >
-      <div class="w-26 h-26 grid place-items-center rounded-full bg-secondary text-primary mb-2">
-        <UIcon
-          name="i-lucide-shopping-cart"
-          class="size-12"
-          aria-hidden="true"
+    <UCard v-else-if="!cart.items.length">
+      <EmptyState
+        icon="i-lucide-shopping-cart"
+        title="Your cart is waiting for its first find."
+        description="Explore books and stationery to get started."
+      >
+        <UButton
+          to="/shop"
+          label="Explore the shop"
+          trailing-icon="i-lucide-arrow-right"
         />
-      </div>
-      <h2 class="text-[24px] leading-[1.4] font-semibold">
-        Your cart is waiting for its first find.
-      </h2>
-      <p class="text-muted leading-[1.7]">Explore books and stationery to get started.</p>
-      <AppButton to="/shop"
-        >Explore the shop<UIcon
-          name="i-lucide-arrow-right"
-          aria-hidden="true"
-      /></AppButton>
-    </div>
+      </EmptyState>
+    </UCard>
     <div
       v-else
-      class="
-        grid grid-cols-[minmax(0,_1fr)_340px] gap-8 items-start
-        max-[1101px]:grid-cols-[minmax(0,_1fr)_300px] max-[1101px]:gap-5 max-[761px]:grid-cols-1
-      "
+      class="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_340px]"
       :aria-busy="busy"
     >
-      <div
-        class="bg-white border border-border rounded-2xl py-0 px-6 max-[481px]:py-0 max-[481px]:px-4"
-      >
-        <div class="flex items-center justify-between gap-4 py-5 px-0 text-[14px]">
-          <p>{{ cart.item_count }} {{ cart.item_count === 1 ? 'item' : 'items' }}</p>
-          <button
-            type="button"
-            class="text-muted text-xs underline underline-offset-3 cursor-pointer hover:text-[#a03939]"
-            :disabled="busy"
-            @click="clear()"
+      <UCard :ui="{ body: 'p-0 sm:p-0' }">
+        <template #header>
+          <div class="flex items-center justify-between gap-4">
+            <h2 class="font-semibold text-highlighted">
+              {{ cart.item_count }} {{ cart.item_count === 1 ? 'item' : 'items' }}
+            </h2>
+            <UButton
+              label="Clear cart"
+              icon="i-lucide-trash-2"
+              color="error"
+              variant="ghost"
+              size="sm"
+              :disabled="busy"
+              @click="clear()"
+            />
+          </div>
+        </template>
+        <ul class="divide-y divide-default">
+          <li
+            v-for="item in cart.items"
+            :key="item.product.id"
           >
-            Clear cart
-          </button>
-        </div>
-        <CartLine
-          v-for="item in cart.items"
-          :key="item.product.id"
-          :item="item"
-        />
-      </div>
-      <aside
-        class="bg-white border border-border rounded-2xl p-6.5 max-[761px]:max-w-none"
+            <CartLine :item="item" />
+          </li>
+        </ul>
+      </UCard>
+
+      <UCard
+        as="aside"
         aria-labelledby="cart-summary-title"
+        class="lg:sticky lg:top-24"
       >
-        <h2
-          class="text-[21px] font-semibold mb-6.5"
-          id="cart-summary-title"
-        >
-          Cart summary
-        </h2>
-        <div class="flex justify-between gap-5 text-base">
-          <span>Subtotal</span
-          ><strong class="text-heading text-lg whitespace-nowrap"
-            >RM {{ Number(cart.subtotal).toFixed(2) }}</strong
+        <template #header>
+          <h2
+            id="cart-summary-title"
+            class="font-semibold text-highlighted"
           >
+            Cart summary
+          </h2>
+        </template>
+        <div class="flex items-baseline justify-between gap-5">
+          <span class="text-muted">Subtotal</span>
+          <strong class="text-2xl font-bold whitespace-nowrap text-highlighted">
+            {{ formatMoney(cart.subtotal) }}
+          </strong>
         </div>
-        <p class="text-xs leading-[1.8] text-muted border-t border-border my-5.5 mx-0 pt-5">
+        <p class="mt-4 text-xs leading-relaxed text-muted">
           Your cart is saved to your account. Prices and availability are checked when you make
           changes. Items are not reserved.
         </p>
-        <AppButton
-          class="w-full justify-center"
-          to="/shop"
-          >Keep exploring<UIcon
-            name="i-lucide-arrow-right"
-            aria-hidden="true"
-        /></AppButton>
-      </aside>
+        <template #footer>
+          <UButton
+            to="/shop"
+            label="Keep exploring"
+            trailing-icon="i-lucide-arrow-right"
+            block
+            size="lg"
+          />
+        </template>
+      </UCard>
     </div>
   </section>
 </template>

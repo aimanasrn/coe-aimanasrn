@@ -1,9 +1,9 @@
 <script setup lang="ts">
-  import { catalogDialogUi } from '~/utils/dialogUi'
   import type { Product } from '~/types/catalog'
 
   const props = defineProps<{
     product: Product
+    labeled?: boolean
   }>()
 
   const emit = defineEmits<{
@@ -14,15 +14,9 @@
   const notification = useActionToast()
   const open = ref(false)
   const busy = ref(false)
-  const trigger = useTemplateRef('trigger')
-
-  function confirmDelete() {
-    open.value = true
-  }
 
   async function deleteProduct() {
     if (busy.value) return
-
     busy.value = true
 
     try {
@@ -37,8 +31,10 @@
       )
       emit('deleted')
     } catch {
-      const message = 'We could not delete this product. Please try again.'
-      notification.error('Product was not deleted', message)
+      notification.error(
+        'Product was not deleted',
+        'We could not delete this product. Please try again.'
+      )
     } finally {
       busy.value = false
     }
@@ -46,22 +42,27 @@
 </script>
 
 <template>
-  <UTooltip text="Delete product">
-    <AppIconButton
-      ref="trigger"
-      type="button"
-      variant="danger"
+  <UButton
+    v-if="labeled"
+    icon="i-lucide-trash-2"
+    label="Delete"
+    color="error"
+    variant="soft"
+    aria-haspopup="dialog"
+    @click="open = true"
+  />
+  <UTooltip
+    v-else
+    text="Delete product"
+  >
+    <UButton
+      icon="i-lucide-trash-2"
+      color="error"
+      variant="ghost"
       :aria-label="`Delete ${product.name}`"
       aria-haspopup="dialog"
-      :aria-expanded="open"
-      @click="confirmDelete"
-    >
-      <UIcon
-        name="i-lucide-trash-2"
-        mode="svg"
-        aria-hidden="true"
-      />
-    </AppIconButton>
+      @click="open = true"
+    />
   </UTooltip>
   <UModal
     v-model:open="open"
@@ -69,35 +70,28 @@
     description="Remove this product from your StudyMart catalog."
     :dismissible="!busy"
     :close="!busy"
-    :ui="catalogDialogUi"
-    @after:leave="trigger?.focus()"
+    :ui="{ footer: 'justify-end' }"
   >
     <template #body>
-      <div class="flex flex-col gap-5">
-        <p>
-          Delete
-          <strong>{{ product.name }}</strong>
-          ? This action cannot be undone.
-        </p>
-        <div class="flex justify-end gap-3 pt-[5px]">
-          <AppButton
-            type="button"
-            variant="secondary"
-            :disabled="busy"
-            @click="open = false"
-          >
-            Cancel
-          </AppButton>
-          <AppButton
-            type="button"
-            variant="danger"
-            :disabled="busy"
-            @click="deleteProduct"
-          >
-            {{ busy ? 'Deleting product...' : 'Delete product' }}
-          </AppButton>
-        </div>
-      </div>
+      <p>
+        Delete <strong class="text-highlighted">{{ product.name }}</strong
+        >? This action cannot be undone.
+      </p>
+    </template>
+    <template #footer>
+      <UButton
+        label="Cancel"
+        color="neutral"
+        variant="outline"
+        :disabled="busy"
+        @click="open = false"
+      />
+      <UButton
+        :label="busy ? 'Deleting product...' : 'Delete product'"
+        color="error"
+        :loading="busy"
+        @click="deleteProduct"
+      />
     </template>
   </UModal>
 </template>

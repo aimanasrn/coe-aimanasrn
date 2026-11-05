@@ -5,7 +5,7 @@
 <template>
   <div
     v-if="isLoading"
-    class="fixed inset-0 z-80 grid place-items-center bg-white/90 backdrop-blur-xs"
+    class="fixed inset-0 z-80 grid place-items-center bg-default/85 backdrop-blur-xs"
   >
     <StudyMartLoader label="Loading page" />
   </div>

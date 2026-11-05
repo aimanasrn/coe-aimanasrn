@@ -1,10 +1,7 @@
 <template>
-  <AppButton to="/admin/products/create">
-    <UIcon
-      name="i-lucide-plus"
-      mode="svg"
-      aria-hidden="true"
-    />
-    Add product
-  </AppButton>
+  <UButton
+    to="/admin/products/create"
+    icon="i-lucide-plus"
+    label="Add product"
+  />
 </template>

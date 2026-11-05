@@ -8,7 +8,6 @@
 
   definePageMeta({
     layout: 'admin',
-    colorMode: 'light',
     alias: ['/admin/products/:id']
   })
   const route = useRoute()
@@ -38,22 +37,10 @@
     product.value
       ? [
           { label: 'SKU', value: product.value.sku },
-          {
-            label: 'Category',
-            value: product.value.category?.name ?? 'Uncategorised'
-          },
-          {
-            label: 'Brand / publisher',
-            value: product.value.brand || 'Not provided'
-          },
-          {
-            label: 'Barcode / ISBN',
-            value: product.value.barcode || 'Not provided'
-          },
-          {
-            label: 'Selling unit',
-            value: unitLabels[product.value.unit ?? 'item']
-          },
+          { label: 'Category', value: product.value.category?.name ?? 'Uncategorised' },
+          { label: 'Brand / publisher', value: product.value.brand || 'Not provided' },
+          { label: 'Barcode / ISBN', value: product.value.barcode || 'Not provided' },
+          { label: 'Selling unit', value: unitLabels[product.value.unit ?? 'item'] },
           { label: 'Added', value: formatDate(product.value.created_at) },
           { label: 'Last updated', value: formatDate(product.value.updated_at) }
         ]
@@ -80,57 +67,40 @@
       @retry="refresh()"
     />
     <template v-else>
-      <header
-        class="
-          flex items-start justify-between gap-5 mb-7 [&_>_:is(button,_a)]:flex-none max-md:flex-wrap
-          max-md:gap-4.5 max-md:mb-6
-        "
-      >
-        <div>
-          <h1
-            class="
-              m-0 text-heading text-[34px] font-semibold leading-[1.2] tracking-[-0.9px] wrap-anywhere
-              max-md:text-[30px]
-            "
-          >
-            {{ product.name }}
-          </h1>
-          <p class="mt-[9px] text-muted text-base leading-[1.6] max-md:text-sm">
-            {{ product.sku }}
-            <span aria-hidden="true">·</span>
-            {{ product.category?.name ?? 'Uncategorised' }}
-          </p>
-        </div>
-        <div class="flex shrink-0 items-center gap-3 max-md:w-full max-md:justify-end">
+      <PageHeader :title="product.name">
+        <template #description>
+          {{ product.sku }}
+          <span aria-hidden="true">·</span>
+          {{ product.category?.name ?? 'Uncategorised' }}
+        </template>
+        <template #actions>
           <DeleteProductModal
             :product="product"
+            labeled
             @deleted="navigateTo('/admin/products')"
           />
-          <AppButton :to="editTo">
-            <UIcon
-              name="i-lucide-pencil"
-              mode="svg"
-              aria-hidden="true"
-            />
-            Edit product
-          </AppButton>
-        </div>
-      </header>
-      <div class="grid grid-cols-2 items-start gap-6 max-[1101px]:grid-cols-1">
-        <ProductGallery
-          :images="product.image_urls ?? []"
-          :name="product.name"
-          :edit-to="editTo"
-        />
-        <article
-          class="min-w-0 p-6.5 border border-border rounded-xl bg-white max-md:py-5 max-md:px-4.5"
-        >
-          <p class="text-heading text-[36px] font-semibold leading-[1.2] tracking-[-0.8px]">
+          <UButton
+            :to="editTo"
+            icon="i-lucide-pencil"
+            label="Edit product"
+          />
+        </template>
+      </PageHeader>
+
+      <div class="grid items-start gap-6 lg:grid-cols-2">
+        <UCard :ui="{ body: 'p-3 sm:p-3' }">
+          <ProductGallery
+            :images="product.image_urls ?? []"
+            :name="product.name"
+            :edit-to="editTo"
+          />
+        </UCard>
+
+        <UCard as="article">
+          <p class="text-3xl font-bold tracking-tight text-highlighted">
             {{ formatMoney(product.price) }}
           </p>
-          <div
-            class="mt-[18px] flex flex-wrap items-center gap-3.5 text-sm leading-[1.5] text-[#6b7871]"
-          >
+          <div class="mt-3 flex flex-wrap items-center gap-3 text-sm text-muted">
             <StockBadge
               :quantity="product.stock_quantity"
               :threshold="5"
@@ -140,45 +110,42 @@
               {{ product.stock_quantity === 1 ? 'unit' : 'units' }} available
             </span>
           </div>
-          <section
-            class="mt-[26px] border-t border-[#e5eae7] pt-[26px]"
-            aria-labelledby="product-details-heading"
-          >
+
+          <USeparator class="my-6" />
+
+          <section aria-labelledby="product-details-heading">
             <h2
-              class="mt-0 mb-5 text-lg leading-[1.4] font-[650] text-heading"
               id="product-details-heading"
+              class="mb-4 font-semibold text-highlighted"
             >
               Product details
             </h2>
-            <dl class="flex flex-col gap-[15px] text-sm leading-[1.5]">
+            <dl class="grid gap-3 text-sm">
               <div
-                class="
-                  grid grid-cols-[minmax(110px,1fr)_minmax(0,1.2fr)] gap-4
-                  max-md:grid-cols-[minmax(100px,1fr)_minmax(0,1.2fr)]
-                "
                 v-for="detail in details"
                 :key="detail.label"
+                class="grid grid-cols-[minmax(110px,1fr)_minmax(0,1.4fr)] gap-4"
               >
-                <dt class="text-[#7b867f]">{{ detail.label }}</dt>
-                <dd class="text-[#37463f] wrap-anywhere">{{ detail.value }}</dd>
+                <dt class="text-muted">{{ detail.label }}</dt>
+                <dd class="text-highlighted wrap-anywhere">{{ detail.value }}</dd>
               </div>
             </dl>
           </section>
-          <section
-            class="mt-[26px] border-t border-[#e5eae7] pt-[26px]"
-            aria-labelledby="product-description-heading"
-          >
+
+          <USeparator class="my-6" />
+
+          <section aria-labelledby="product-description-heading">
             <h2
-              class="mt-0 mb-5 text-lg leading-[1.4] font-[650] text-heading"
               id="product-description-heading"
+              class="mb-3 font-semibold text-highlighted"
             >
               Description
             </h2>
-            <p class="text-[15px] leading-[1.8] text-[#66746c] whitespace-pre-wrap wrap-anywhere">
+            <p class="leading-relaxed whitespace-pre-wrap text-muted wrap-anywhere">
               {{ product.description || 'No description has been added yet.' }}
             </p>
           </section>
-        </article>
+        </UCard>
       </div>
     </template>
   </section>

@@ -4,11 +4,19 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\LandingController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProfilePhotoController;
 use App\Http\Controllers\Api\ShopController;
 use App\Http\Middleware\EnsureTokenIsCurrent;
 use Illuminate\Support\Facades\Route;
+
+Route::prefix('landing')->group(function (): void {
+    Route::get('/', LandingController::class)->middleware('throttle:60,1');
+    Route::get('/products/{product}/images/{image}', [ProductController::class, 'image'])
+        ->whereNumber(['product', 'image'])
+        ->middleware('throttle:240,1');
+});
 
 Route::prefix('auth')->group(function (): void {
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');

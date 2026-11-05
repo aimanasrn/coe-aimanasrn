@@ -1,33 +1,30 @@
 <script setup lang="ts">
-  defineProps<{
-    admin?: boolean
-    caption?: string
-    inverse?: boolean
-  }>()
+  defineProps<{ caption?: string }>()
 </script>
 
 <template>
-  <span
-    class="
-      inline-flex items-center gap-2.5 font-sans leading-none font-bold tracking-[-0.8px]
-      whitespace-nowrap
-    "
-    :class="inverse ? 'text-[26px] text-white' : 'text-[28px] text-brand-deep'"
-  >
+  <span class="inline-flex items-center gap-2.5 leading-none whitespace-nowrap">
     <img
-      :src="inverse ? '/studymart-mark-inverse.svg' : '/studymart-mark.svg'"
+      src="/studymart-mark.svg"
       alt=""
-      width="40"
-      height="40"
-      class="block size-10 flex-none"
+      width="36"
+      height="36"
+      class="block size-9 flex-none dark:hidden"
     />
-    <span class="flex flex-col gap-1.75">
-      <span>StudyMart</span>
+    <img
+      src="/studymart-mark-inverse.svg"
+      alt=""
+      width="36"
+      height="36"
+      class="hidden size-9 flex-none dark:block"
+    />
+    <span class="flex flex-col gap-1">
+      <span class="text-xl font-extrabold tracking-tight text-highlighted">StudyMart</span>
       <span
-        v-if="admin"
-        class="text-[11px] font-normal tracking-[2px] uppercase opacity-75"
+        v-if="caption"
+        class="text-[11px] font-semibold tracking-[0.18em] text-muted uppercase"
       >
-        {{ caption || 'Admin' }}
+        {{ caption }}
       </span>
     </span>
   </span>

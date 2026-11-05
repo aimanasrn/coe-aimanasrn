@@ -1,5 +1,4 @@
 <script setup lang="ts">
-  import { catalogDialogUi } from '~/utils/dialogUi'
   import type { Category, CategoryDialogMode } from '~/types/catalog'
   import CategoryForm from '~/components/admin/CategoryForm.vue'
 
@@ -57,18 +56,18 @@
       open.value = false
       emit('deleted')
     } catch (error: unknown) {
-      const response = error as {
-        statusCode?: number
-        data?: { message?: string }
-      }
+      const response = error as { statusCode?: number; data?: { message?: string } }
       if (response.statusCode === 409) {
-        const message =
+        notification.warning(
+          'Category is in use',
           response.data?.message ??
-          'Move this category’s products to another category before deleting it.'
-        notification.warning('Category is in use', message)
+            'Move this category’s products to another category before deleting it.'
+        )
       } else {
-        const message = 'We could not delete this category. Please try again.'
-        notification.error('Category was not deleted', message)
+        notification.error(
+          'Category was not deleted',
+          'We could not delete this category. Please try again.'
+        )
       }
     } finally {
       busy.value = false
@@ -83,7 +82,7 @@
     :description="descriptions[mode]"
     :dismissible="!busy"
     :close="!busy"
-    :ui="catalogDialogUi"
+    :ui="{ footer: 'justify-end' }"
     @update:open="close"
     @after:leave="emit('closed')"
   >
@@ -96,86 +95,79 @@
         @cancel="close()"
         @busy="busy = $event"
       />
-      <div
+      <dl
         v-else-if="category && mode === 'view'"
-        class="flex flex-col gap-5"
+        class="grid gap-5"
       >
-        <dl class="grid gap-5">
-          <div>
-            <dt class="mb-[5px] text-[13px] text-[#7b867f]">Category name</dt>
-            <dd class="m-0 max-h-60 overflow-y-auto text-heading whitespace-pre-wrap wrap-anywhere">
-              {{ category.name }}
-            </dd>
-          </div>
-          <div>
-            <dt class="mb-[5px] text-[13px] text-[#7b867f]">Description</dt>
-            <dd class="m-0 max-h-60 overflow-y-auto text-heading whitespace-pre-wrap wrap-anywhere">
-              {{ category.description || 'No description has been added yet.' }}
-            </dd>
-          </div>
-          <div>
-            <dt class="mb-[5px] text-[13px] text-[#7b867f]">Products</dt>
-            <dd class="m-0 max-h-60 overflow-y-auto text-heading whitespace-pre-wrap wrap-anywhere">
-              {{ (category.products_count ?? 0).toLocaleString() }}
-            </dd>
-          </div>
-        </dl>
-        <div class="flex justify-end gap-3 pt-[5px]">
-          <AppButton
-            type="button"
-            variant="secondary"
-            @click="close()"
-          >
-            Close
-          </AppButton>
-          <AppButton
-            type="button"
-            @click="emit('edit', category)"
-          >
-            Edit category
-          </AppButton>
+        <div>
+          <dt class="mb-1 text-sm text-muted">Category name</dt>
+          <dd class="font-semibold text-highlighted wrap-anywhere">{{ category.name }}</dd>
         </div>
-      </div>
+        <div>
+          <dt class="mb-1 text-sm text-muted">Description</dt>
+          <dd class="max-h-60 overflow-y-auto whitespace-pre-wrap wrap-anywhere">
+            {{ category.description || 'No description has been added yet.' }}
+          </dd>
+        </div>
+        <div>
+          <dt class="mb-1 text-sm text-muted">Products</dt>
+          <dd class="text-highlighted">{{ (category.products_count ?? 0).toLocaleString() }}</dd>
+        </div>
+      </dl>
       <div
         v-else-if="category"
-        class="flex flex-col gap-5"
+        class="flex flex-col gap-4"
       >
         <p>
-          Delete
-          <strong>{{ category.name }}</strong>
-          ? This action cannot be undone.
+          Delete <strong class="text-highlighted">{{ category.name }}</strong
+          >? This action cannot be undone.
         </p>
-        <p
+        <UAlert
           v-if="hasProducts"
-          class="
-            mb-5 rounded-[7px] border px-[18px] py-3.5 text-sm border-[#fde68a] bg-[#fffbeb]
-            text-[#92400e]
-          "
-          role="status"
-        >
-          This category contains {{ category.products_count }}
-          {{ category.products_count === 1 ? 'product' : 'products' }}. Move them to another
-          category before deleting it.
-        </p>
-        <div class="flex justify-end gap-3 pt-[5px]">
-          <AppButton
-            type="button"
-            variant="secondary"
-            :disabled="busy"
-            @click="close()"
-          >
-            Cancel
-          </AppButton>
-          <AppButton
-            type="button"
-            variant="danger"
-            :disabled="busy || hasProducts"
-            @click="deleteCategory"
-          >
-            {{ busy ? 'Deleting category...' : 'Delete category' }}
-          </AppButton>
-        </div>
+          color="warning"
+          variant="subtle"
+          icon="i-lucide-triangle-alert"
+          :description="`This category contains ${category.products_count} ${
+            category.products_count === 1 ? 'product' : 'products'
+          }. Move them to another category before deleting it.`"
+        />
       </div>
+    </template>
+
+    <template
+      v-if="category && mode === 'view'"
+      #footer
+    >
+      <UButton
+        label="Close"
+        color="neutral"
+        variant="outline"
+        @click="close()"
+      />
+      <UButton
+        label="Edit category"
+        icon="i-lucide-pencil"
+        @click="emit('edit', category)"
+      />
+    </template>
+    <template
+      v-else-if="category && mode === 'delete'"
+      #footer
+    >
+      <UButton
+        label="Cancel"
+        color="neutral"
+        variant="outline"
+        :disabled="busy"
+        @click="close()"
+      />
+      <UButton
+        :label="busy ? 'Deleting category...' : 'Delete category'"
+        color="error"
+        :loading="busy"
+        :disabled="hasProducts"
+        @click="deleteCategory"
+      />
     </template>
   </UModal>
 </template>

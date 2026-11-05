@@ -1,5 +1,4 @@
 <script setup lang="ts">
-  import { catalogFormUi } from '~/utils/formUi'
   import type { FormError, FormErrorEvent } from '@nuxt/ui'
   import type { Product, ProductImageEntry, ProductResponse } from '~/types/catalog'
   import ProductImageUpload from '~/components/products/ProductImageUpload.vue'
@@ -22,7 +21,6 @@
   const isEditing = computed(() => Boolean(props.product))
   const form = reactive({
     name: props.product?.name ?? '',
-    sku: props.product?.sku ?? '',
     category_id: props.product?.category ? String(props.product.category.id) : undefined,
     price: (props.product?.price ?? '') as string | number,
     stock_quantity: (props.product?.stock_quantity ?? 0) as string | number,
@@ -64,32 +62,18 @@
     const errors: FormError[] = []
     if (imageError.value) errors.push({ name: 'images', message: imageError.value })
     if (form.brand.length > 150)
-      errors.push({
-        name: 'brand',
-        message: 'Please use 150 characters or fewer.'
-      })
+      errors.push({ name: 'brand', message: 'Please use 150 characters or fewer.' })
     if (form.barcode.length > 64)
-      errors.push({
-        name: 'barcode',
-        message: 'Please use 64 characters or fewer.'
-      })
+      errors.push({ name: 'barcode', message: 'Please use 64 characters or fewer.' })
 
-    for (const [name, max] of [
-      ['name', 150],
-      ['sku', 64]
-    ] as const) {
-      if (!form[name].trim()) errors.push({ name, message: 'Please fill in this field.' })
-      else if (form[name].length > max)
-        errors.push({ name, message: `Please use ${max} characters or fewer.` })
-    }
+    if (!form.name.trim()) errors.push({ name: 'name', message: 'Please fill in this field.' })
+    else if (form.name.length > 150)
+      errors.push({ name: 'name', message: 'Please use 150 characters or fewer.' })
 
     if (!form.category_id)
       errors.push({ name: 'category_id', message: 'Please select a category.' })
     else if (!categoryItems.value.some((category) => category.value === form.category_id)) {
-      errors.push({
-        name: 'category_id',
-        message: 'Please select a valid category.'
-      })
+      errors.push({ name: 'category_id', message: 'Please select a valid category.' })
     }
 
     for (const name of ['price', 'stock_quantity'] as const) {
@@ -99,17 +83,11 @@
 
       if (String(value).trim() === '') errors.push({ name, message: 'Please fill in this field.' })
       else if (!Number.isFinite(number) || number < 0 || number > max) {
-        errors.push({
-          name,
-          message: `Please enter a number between 0 and ${max}.`
-        })
+        errors.push({ name, message: `Please enter a number between 0 and ${max}.` })
       } else if (name === 'stock_quantity' && !Number.isInteger(number)) {
         errors.push({ name, message: 'Please enter a whole number.' })
       } else if (name === 'price' && !/^\d+(\.\d{1,2})?$/.test(String(number))) {
-        errors.push({
-          name,
-          message: 'Please enter a price with at most 2 decimal places.'
-        })
+        errors.push({ name, message: 'Please enter a price with at most 2 decimal places.' })
       }
     }
 
@@ -175,13 +153,13 @@
       )
 
       productForm.value?.setErrors(errors)
-      const message = errors.length
-        ? 'Please check the highlighted fields.'
-        : 'We could not save this product. Please try again.'
       if (errors.length) {
-        notification.warning('Please check the form', message)
+        notification.warning('Please check the form', 'Please check the highlighted fields.')
       } else {
-        notification.error('Product was not saved', message)
+        notification.error(
+          'Product was not saved',
+          'We could not save this product. Please try again.'
+        )
       }
     } finally {
       saving.value = false
@@ -193,32 +171,30 @@
 <template>
   <div
     v-if="status === 'pending' || status === 'idle'"
-    class="grid min-h-[235px] place-items-center p-[26px]"
+    class="grid min-h-[235px] place-items-center"
   >
     <StudyMartLoader label="Loading categories" />
   </div>
-  <div
+  <UAlert
     v-else-if="error"
-    class="mb-5 rounded-[7px] border px-[18px] py-3.5 text-sm border-[#f0d5d5] bg-[#fff4f4] text-[#a03939]"
-  >
-    Could not load categories.
-    <button
-      class="
-        inline-flex items-center gap-2 rounded-[3px] text-primary text-sm font-medium leading-normal
-        cursor-pointer [&_.iconify]:w-4.5 [&_.iconify]:h-4.5 [&_.iconify]:flex-none
-        hover:text-primary-hover hover:underline hover:underline-offset-4
-      "
-      @click="refresh()"
-    >
-      Try again
-    </button>
-  </div>
-  <p
+    color="error"
+    variant="subtle"
+    icon="i-lucide-circle-alert"
+    title="Could not load categories."
+    :actions="[
+      { label: 'Try again', color: 'error', variant: 'outline', onClick: () => refresh() }
+    ]"
+  />
+  <UAlert
     v-else-if="!categories?.data.length"
-    class="mb-5 rounded-[7px] border px-[18px] py-3.5 text-sm border-[#d3ead9] bg-[#edf8f0] text-[#25683b]"
-  >
-    Create a category in your catalog before adding a product.
-  </p>
+    color="info"
+    variant="subtle"
+    icon="i-lucide-info"
+    title="Create a category before adding a product."
+    :actions="[
+      { label: 'Go to categories', color: 'info', variant: 'outline', to: '/admin/categories' }
+    ]"
+  />
   <UForm
     v-else
     ref="productForm"
@@ -226,33 +202,25 @@
     :validate="validate"
     :validate-on="['blur', 'change', 'input']"
     :disabled="saving"
-    class="flex flex-col gap-5"
+    class="flex flex-col gap-6"
     novalidate
     @submit="submit"
     @error="focusFirstError"
   >
-    <div
-      class="
-        grid grid-cols-[minmax(0,_0.8fr)_minmax(0,_1.4fr)] items-stretch gap-5.5
-        max-[1101px]:grid-cols-1
-      "
-    >
-      <section
-        class="
-          min-w-0 overflow-hidden border border-border rounded-xl bg-white p-6.5 max-md:py-5
-          max-md:px-4.5
-        "
+    <div class="grid items-start gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.4fr)]">
+      <UCard
+        as="section"
         aria-labelledby="product-images-heading"
       >
-        <h2
-          class="
-            m-0 text-heading text-xl font-semibold leading-[1.4] tracking-[-0.4px] max-md:text-lg mb-5.5
-            max-md:mb-5
-          "
-          id="product-images-heading"
-        >
-          Product images
-        </h2>
+        <template #header>
+          <h2
+            id="product-images-heading"
+            class="text-lg font-semibold text-highlighted"
+          >
+            Product images
+          </h2>
+          <p class="mt-1 text-sm text-muted">The first image is used as the cover.</p>
+        </template>
         <UFormField
           name="images"
           :error="imageError || undefined"
@@ -263,202 +231,193 @@
             @error="imageError = $event"
           />
         </UFormField>
-      </section>
-      <section
-        class="
-          min-w-0 overflow-hidden border border-border rounded-xl bg-white p-6.5 max-md:py-5
-          max-md:px-4.5 flex flex-col gap-5
-        "
+      </UCard>
+
+      <UCard
+        as="section"
         aria-labelledby="product-information-heading"
       >
-        <h2
-          class="
-            m-0 text-heading text-xl font-semibold leading-[1.4] tracking-[-0.4px] max-md:text-lg
-            max-md:mb-5 mb-0
-          "
-          id="product-information-heading"
-        >
-          Product information
-        </h2>
-        <UFormField
-          name="name"
-          label="Product name"
-          required
-          :ui="catalogFormUi.field"
-        >
-          <UInput
-            :ui="catalogFormUi.input"
-            id="product-name"
-            placeholder="Enter product name"
-            v-model="form.name"
-            required
-            :maxlength="150"
-            class="w-full"
-          />
-        </UFormField>
-        <div class="grid grid-cols-2 gap-5 max-md:grid-cols-1 max-md:gap-[18px]">
-          <UFormField
-            name="sku"
-            label="SKU"
-            required
-            :ui="catalogFormUi.field"
-          >
-            <UInput
-              :ui="catalogFormUi.input"
-              id="product-sku"
-              placeholder="Enter SKU"
-              v-model="form.sku"
-              required
-              :maxlength="64"
-              class="w-full"
-            />
-          </UFormField>
-          <UFormField
-            name="category_id"
-            label="Category"
-            required
-            :ui="catalogFormUi.field"
-          >
-            <USelect
-              :ui="catalogFormUi.select"
-              id="product-category"
-              v-model="form.category_id"
-              :items="categoryItems"
-              placeholder="Select category"
-              required
-              class="w-full"
-              size="lg"
-            />
-          </UFormField>
-          <UFormField
-            name="price"
-            label="Price (RM)"
-            required
-            :ui="catalogFormUi.field"
-          >
-            <UInput
-              :ui="catalogFormUi.input"
-              id="text-heading text-[36px] font-semibold leading-[1.2] tracking-[-0.8px]"
-              placeholder="0.00"
-              v-model="form.price"
-              type="number"
-              required
-              :min="0"
-              :max="9999999999.99"
-              :step="0.01"
-              class="w-full"
-            />
-          </UFormField>
-          <UFormField
-            name="stock_quantity"
-            label="Stock quantity"
-            required
-            :ui="catalogFormUi.field"
-          >
-            <UInput
-              :ui="catalogFormUi.input"
-              id="product-stock"
-              v-model="form.stock_quantity"
-              type="number"
-              required
-              :min="0"
-              :max="2147483647"
-              :step="1"
-              class="w-full"
-            />
-          </UFormField>
-        </div>
-        <UFormField
-          name="description"
-          :ui="catalogFormUi.field"
-        >
-          <template #label>
-            Description
-            <span>(optional)</span>
-          </template>
-          <UTextarea
-            :ui="catalogFormUi.textarea"
-            id="product-description"
-            placeholder="Enter product description..."
-            v-model="form.description"
-            :rows="3"
-            class="w-full"
-          />
-        </UFormField>
-        <div class="mt-1 border-t border-[#e5eae7] pt-6">
+        <template #header>
           <h2
-            class="m-0 text-heading text-xl font-semibold leading-[1.4] tracking-[-0.4px] max-md:text-lg"
+            id="product-information-heading"
+            class="text-lg font-semibold text-highlighted"
           >
-            Additional details
-            <span class="ml-2 text-[13px] font-normal text-[#89928c]">Optional</span>
+            Product information
           </h2>
-          <div
-            class="
-              grid max-md:gap-[18px] mt-4.5 grid-cols-[minmax(0,1.2fr)_minmax(0,1.2fr)_minmax(0,1fr)]
-              gap-4 max-md:grid-cols-1
-            "
+        </template>
+        <div class="flex flex-col gap-5">
+          <UFormField
+            name="name"
+            label="Product name"
+            required
           >
+            <UInput
+              id="product-name"
+              v-model="form.name"
+              placeholder="Enter product name"
+              required
+              :maxlength="150"
+              size="lg"
+              class="w-full"
+            />
+          </UFormField>
+          <div class="grid gap-5 sm:grid-cols-2">
+            <UFormField
+              label="SKU"
+              :help="
+                product
+                  ? 'SKUs are assigned automatically and cannot be changed.'
+                  : 'Created when you save, from the category and product number.'
+              "
+            >
+              <UInput
+                id="product-sku"
+                :model-value="product?.sku ?? ''"
+                placeholder="Generated automatically"
+                icon="i-lucide-lock"
+                readonly
+                variant="soft"
+                size="lg"
+                class="w-full"
+              />
+            </UFormField>
+            <UFormField
+              name="category_id"
+              label="Category"
+              required
+            >
+              <USelect
+                id="product-category"
+                v-model="form.category_id"
+                :items="categoryItems"
+                placeholder="Select category"
+                required
+                size="lg"
+                class="w-full"
+              />
+            </UFormField>
+            <UFormField
+              name="price"
+              label="Price"
+              required
+            >
+              <UInput
+                id="product-price"
+                v-model="form.price"
+                type="number"
+                placeholder="0.00"
+                required
+                :min="0"
+                :max="9999999999.99"
+                :step="0.01"
+                size="lg"
+                class="w-full"
+                :ui="{ base: 'ps-12' }"
+              >
+                <template #leading>
+                  <span class="text-sm text-muted">RM</span>
+                </template>
+              </UInput>
+            </UFormField>
+            <UFormField
+              name="stock_quantity"
+              label="Stock quantity"
+              required
+            >
+              <UInput
+                id="product-stock"
+                v-model="form.stock_quantity"
+                type="number"
+                required
+                :min="0"
+                :max="2147483647"
+                :step="1"
+                size="lg"
+                class="w-full"
+              />
+            </UFormField>
+          </div>
+          <UFormField
+            name="description"
+            label="Description"
+            hint="Optional"
+          >
+            <UTextarea
+              id="product-description"
+              v-model="form.description"
+              placeholder="Enter product description..."
+              :rows="4"
+              autoresize
+              class="w-full"
+            />
+          </UFormField>
+
+          <USeparator
+            label="Additional details (optional)"
+            class="my-1"
+          />
+
+          <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
             <UFormField
               name="brand"
               label="Brand / publisher"
-              :ui="catalogFormUi.field"
             >
               <UInput
-                :ui="catalogFormUi.input"
                 id="product-brand"
-                placeholder="Enter brand or publisher"
                 v-model="form.brand"
+                placeholder="Enter brand or publisher"
                 :maxlength="150"
+                size="lg"
                 class="w-full"
               />
             </UFormField>
             <UFormField
               name="barcode"
               label="Barcode / ISBN"
-              :ui="catalogFormUi.field"
             >
               <UInput
-                :ui="catalogFormUi.input"
                 id="product-barcode"
-                placeholder="Enter barcode or ISBN"
                 v-model="form.barcode"
+                placeholder="Enter barcode or ISBN"
                 :maxlength="64"
+                size="lg"
                 class="w-full"
               />
             </UFormField>
             <UFormField
               name="unit"
               label="Selling unit"
-              :ui="catalogFormUi.field"
             >
               <USelect
-                :ui="catalogFormUi.select"
                 id="product-unit"
                 v-model="form.unit"
                 :items="unitItems"
-                class="w-full"
                 size="lg"
+                class="w-full"
               />
             </UFormField>
           </div>
         </div>
-      </section>
+      </UCard>
     </div>
-    <div class="flex justify-end gap-3 pt-1">
-      <AppButton
-        type="button"
-        variant="secondary"
+
+    <div
+      class="sticky bottom-0 z-10 -mx-4 flex justify-end gap-2 border-t border-default bg-muted/90 px-4 py-4 backdrop-blur sm:mx-0 sm:rounded-xl sm:border sm:bg-default/90 sm:px-5"
+    >
+      <UButton
+        label="Cancel"
+        color="neutral"
+        variant="outline"
+        size="lg"
         :disabled="saving"
         @click="emit('cancel')"
-      >
-        Cancel
-      </AppButton>
-      <AppButton
+      />
+      <UButton
         type="submit"
-        :disabled="saving"
-      >
-        {{ saving ? 'Saving product...' : isEditing ? 'Save changes' : 'Save product' }}
-      </AppButton>
+        size="lg"
+        :loading="saving"
+        :label="saving ? 'Saving product...' : isEditing ? 'Save changes' : 'Save product'"
+      />
     </div>
   </UForm>
 </template>

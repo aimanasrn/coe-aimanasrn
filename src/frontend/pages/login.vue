@@ -3,7 +3,7 @@
   import AuthField from '~/components/auth/AuthField.vue'
   import { authDestination } from '~/utils/auth'
 
-  definePageMeta({ layout: false, colorMode: 'light' })
+  definePageMeta({ layout: false })
   useHead({ title: 'Log in · StudyMart' })
 
   const route = useRoute()
@@ -50,24 +50,23 @@
     <form
       method="post"
       action="/api/auth/login"
-      class="grid gap-5.5"
+      class="flex flex-col gap-5"
       :aria-busy="submitting"
       @submit.prevent="submit"
     >
       <AuthField
-        variant="auth"
         id="email"
         v-model="email"
         label="Email address"
         type="email"
         autocomplete="username"
-        placeholder="Enter your email"
+        placeholder="you@example.com"
         icon="i-lucide-mail"
+        size="xl"
         :maxlength="254"
         :disabled="submitting || !ready"
       />
       <AuthField
-        variant="auth"
         id="password"
         v-model="password"
         label="Password"
@@ -75,45 +74,26 @@
         autocomplete="current-password"
         placeholder="Enter your password"
         icon="i-lucide-lock-keyhole"
+        size="xl"
         :disabled="submitting || !ready"
       />
-
-      <button
+      <UButton
         type="submit"
-        :disabled="submitting || !ready"
-        class="
-          inline-flex items-center justify-center gap-2.5 py-3 px-5.5 rounded-lg bg-primary text-white
-          font-semibold cursor-pointer transition-[background,border-color,color,box-shadow,transform]
-          duration-150 hover:bg-primary-hover active:translate-y-px disabled:opacity-60
-          disabled:cursor-wait focus-visible:outline-2 focus-visible:outline-solid
-          focus-visible:outline-primary focus-visible:outline-offset-4 w-full min-h-12.5 mt-1
-          text-base max-[761px]:min-h-12
-        "
-      >
-        <UIcon
-          v-if="submitting"
-          name="i-lucide-loader-circle"
-          class="animate-spin motion-reduce:animate-none w-5 h-5"
-          aria-hidden="true"
-        />
-        {{ submitting ? 'Logging in...' : 'Log in' }}
-        <UIcon
-          class="w-5 h-5"
-          v-if="!submitting"
-          name="i-lucide-arrow-right"
-          aria-hidden="true"
-        />
-      </button>
+        size="xl"
+        block
+        class="mt-1"
+        :loading="submitting"
+        :disabled="!ready"
+        :label="submitting ? 'Logging in...' : 'Log in'"
+        :trailing-icon="submitting ? undefined : 'i-lucide-arrow-right'"
+      />
     </form>
-    <p class="mt-6.5 text-muted text-sm leading-[1.6] max-[761px]:text-sm">
+    <p class="mt-8 text-sm text-muted">
       New to StudyMart?
-      <NuxtLink
-        class="
-          ml-[5px] text-primary font-semibold underline underline-offset-3 hover:text-brand-deep
-          max-[361px]:ml-0.5
-        "
+      <ULink
         to="/register"
-        >Create an account</NuxtLink
+        class="font-semibold text-primary hover:underline"
+        >Create an account</ULink
       >
     </p>
   </AuthScene>

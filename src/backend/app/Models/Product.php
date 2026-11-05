@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 
 #[Fillable([
     'category_id',
@@ -28,6 +29,38 @@ class Product extends Model
     use HasFactory;
 
     public const LOW_STOCK_THRESHOLD = 5;
+
+    public const SKU_FALLBACK_CODE = 'PROD';
+
+    /**
+     * Create a product and assign its automatic SKU. A temporary unique value fills the
+     * required column until the new ID is known.
+     *
+     * @param  array<string, mixed>  $attributes
+     */
+    public static function createWithGeneratedSku(array $attributes): self
+    {
+        $product = static::create([...$attributes, 'sku' => 'PENDING-'.Str::uuid()]);
+        $product->update(['sku' => $product->generatedSku()]);
+
+        return $product;
+    }
+
+    /**
+     * Build the automatic SKU: up to four letters from the category name and the zero-padded
+     * product ID, for example BOOK-00042. The ID keeps every generated SKU unique.
+     */
+    public function generatedSku(): string
+    {
+        $code = Str::of($this->category?->name ?? '')
+            ->ascii()
+            ->upper()
+            ->replaceMatches('/[^A-Z0-9]/', '')
+            ->substr(0, 4)
+            ->value();
+
+        return ($code !== '' ? $code : self::SKU_FALLBACK_CODE).'-'.str_pad((string) $this->id, 5, '0', STR_PAD_LEFT);
+    }
 
     protected $hidden = ['images'];
 

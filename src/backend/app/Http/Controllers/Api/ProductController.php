@@ -123,7 +123,7 @@ class ProductController extends Controller
             $data['images'] = [...$images, ...$newImages];
             $product = DB::transaction(function () use ($product, $data): Product {
                 if ($product === null) {
-                    return Product::create($data);
+                    return Product::createWithGeneratedSku($data);
                 }
                 $product->update($data);
 
@@ -160,12 +160,6 @@ class ProductController extends Controller
                 'required',
                 'integer',
                 'exists:categories,id',
-            ],
-            'sku' => [
-                'required',
-                'string',
-                'max:64',
-                Rule::unique('products', 'sku')->ignore($product?->id),
             ],
             'name' => [
                 'required',

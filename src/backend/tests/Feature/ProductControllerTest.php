@@ -20,7 +20,7 @@ class ProductControllerTest extends TestCase
         $this->withToken(auth('api')->login(User::factory()->admin()->create()));
     }
 
-    public function test_updates_the_selected_product_and_allows_keeping_its_sku(): void
+    public function test_updates_the_selected_product_and_keeps_its_sku(): void
     {
         $product = Product::factory()->create();
         $other = Product::factory()->create();
@@ -55,19 +55,19 @@ class ProductControllerTest extends TestCase
         $this->assertDatabaseCount('products', 2);
     }
 
-    public function test_rejects_another_products_sku_without_changing_the_record(): void
+    public function test_ignores_sku_changes_when_updating(): void
     {
         $product = Product::factory()->create();
         $other = Product::factory()->create();
 
-        $this->putJson("/api/products/{$product->id}", $this->payload($product, [
+        $this->putJson("/api/products/{$product->id}", [
+            ...$this->payload($product, ['name' => 'Renamed workbook']),
             'sku' => $other->sku,
-            'name' => 'Should not be saved',
-        ]))->assertUnprocessable()->assertJsonValidationErrors('sku');
+        ])->assertOk()->assertJsonPath('data.sku', $product->sku);
 
         $this->assertDatabaseHas('products', [
             'id' => $product->id,
-            'name' => $product->name,
+            'name' => 'Renamed workbook',
             'sku' => $product->sku,
         ]);
     }
@@ -91,7 +91,6 @@ class ProductControllerTest extends TestCase
     {
         return [
             'missing name' => ['name', ''],
-            'missing sku' => ['sku', ''],
             'missing category' => ['category_id', null],
             'unknown category' => ['category_id', 999999],
             'negative price' => ['price', '-1.00'],
@@ -107,27 +106,59 @@ class ProductControllerTest extends TestCase
         $this->putJson('/api/products/999999', [])->assertNotFound();
     }
 
-    public function test_creates_products_and_still_rejects_duplicate_skus(): void
+    public function test_creates_products_with_an_automatic_sku_and_ignores_a_typed_sku(): void
     {
-        $category = Category::factory()->create();
+        $category = Category::factory()->create(['name' => 'Books']);
         $payload = [
             'name' => 'New workbook',
-            'sku' => 'NEW-WORKBOOK-001',
+            'sku' => 'TYPED-SKU-001',
             'category_id' => $category->id,
             'price' => '19.90',
             'stock_quantity' => 5,
             'description' => null,
         ];
 
-        $this->postJson('/api/products', $payload)
-            ->assertCreated()
-            ->assertJsonPath('data.sku', 'NEW-WORKBOOK-001');
+        $first = $this->postJson('/api/products', $payload)->assertCreated();
+        $second = $this->postJson('/api/products', $payload)->assertCreated();
 
-        $this->postJson('/api/products', $payload)
-            ->assertUnprocessable()
-            ->assertJsonValidationErrors('sku');
+        $firstId = $first->json('data.id');
+        $secondId = $second->json('data.id');
+        $first->assertJsonPath('data.sku', 'BOOK-'.str_pad((string) $firstId, 5, '0', STR_PAD_LEFT));
+        $second->assertJsonPath('data.sku', 'BOOK-'.str_pad((string) $secondId, 5, '0', STR_PAD_LEFT));
+        $this->assertDatabaseMissing('products', ['sku' => 'TYPED-SKU-001']);
+        $this->assertDatabaseCount('products', 2);
+    }
 
-        $this->assertDatabaseCount('products', 1);
+    #[DataProvider('categoryCodes')]
+    public function test_builds_the_sku_code_from_the_category_name(string $categoryName, string $code): void
+    {
+        $category = Category::factory()->create(['name' => $categoryName]);
+
+        $response = $this->postJson('/api/products', [
+            'name' => 'Coded product',
+            'category_id' => $category->id,
+            'price' => '1.00',
+            'stock_quantity' => 1,
+        ])->assertCreated();
+
+        $response->assertJsonPath(
+            'data.sku',
+            $code.'-'.str_pad((string) $response->json('data.id'), 5, '0', STR_PAD_LEFT)
+        );
+    }
+
+    /**
+     * @return array<string, array{string, string}>
+     */
+    public static function categoryCodes(): array
+    {
+        return [
+            'long name' => ['Stationery', 'STAT'],
+            'short name' => ['Art', 'ART'],
+            'spaces and symbols' => ['A4 & paper', 'A4PA'],
+            'accented letters' => ['Écoles', 'ECOL'],
+            'no letters or digits' => ['& ! ?', 'PROD'],
+        ];
     }
 
     public function test_deletes_only_the_selected_product_and_refreshes_inventory_totals(): void
@@ -169,7 +200,7 @@ class ProductControllerTest extends TestCase
     private function payload(Product $product, array $overrides = []): array
     {
         return array_replace($product->only([
-            'category_id', 'sku', 'name', 'description', 'price', 'stock_quantity',
+            'category_id', 'name', 'description', 'price', 'stock_quantity',
         ]), $overrides);
     }
 }

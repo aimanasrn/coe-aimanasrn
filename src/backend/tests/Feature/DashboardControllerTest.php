@@ -133,13 +133,13 @@ class DashboardControllerTest extends TestCase
     {
         $books = Category::factory()->create();
         $payload = [
-            'category_id' => $books->id, 'sku' => 'BOOK-NEW-001', 'name' => 'New Workbook',
+            'category_id' => $books->id, 'name' => 'New Workbook',
             'price' => '12.50', 'stock_quantity' => 10,
         ];
 
         $this->postJson('/api/products', $payload)->assertCreated()->assertJsonPath('data.name', 'New Workbook');
 
-        $this->assertDatabaseHas('products', ['sku' => 'BOOK-NEW-001', 'stock_quantity' => 10]);
+        $this->assertDatabaseHas('products', ['name' => 'New Workbook', 'stock_quantity' => 10]);
         $this->getJson('/api/dashboard')->assertOk()->assertJsonPaths([
             'data.summary.total_products' => 1, 'data.summary.stock_units' => 10,
             'data.summary.stock_value' => '125.00',

@@ -182,7 +182,6 @@ class ProductImagesTest extends TestCase
     {
         return [
             'name' => $product?->name ?? 'Image workbook',
-            'sku' => $product?->sku ?? 'IMAGE-001',
             'category_id' => $product?->category_id ?? Category::factory()->create()->id,
             'price' => $product?->price ?? '12.90',
             'stock_quantity' => $product?->stock_quantity ?? 10,
